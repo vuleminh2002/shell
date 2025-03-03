@@ -62,7 +62,7 @@ void Command::clear() {
         delete _errFile;
     }
     _errFile = NULL;
-
+    _append = false;
     _background = false;
 }
 

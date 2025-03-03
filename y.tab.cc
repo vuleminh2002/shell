@@ -1118,13 +1118,13 @@ yyreduce:
 
   case 9: /* pipline: pipline PIPE command_and_args  */
 #line 67 "shell.y"
-                                {printf("pipe1");}
+                                {printf("   Concac1\n"); }
 #line 1123 "y.tab.cc"
     break;
 
   case 10: /* pipline: command_and_args  */
 #line 68 "shell.y"
-                     {printf("pipe");}
+                     {printf("   Concac2\n"); }
 #line 1129 "y.tab.cc"
     break;
 
