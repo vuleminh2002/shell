@@ -520,7 +520,7 @@ static const yytype_uint8 yyrline[] =
 {
        0,    46,    46,    50,    51,    54,    58,    62,    63,    67,
       68,    72,    80,    81,    85,    86,    90,    97,   107,   110,
-     117,   122,   129,   135,   144,   149,   153
+     117,   122,   129,   135,   143,   148,   152
 };
 #endif
 
@@ -1205,36 +1205,35 @@ yyreduce:
   case 23: /* iomodifier_opt: GREATAMP WORD  */
 #line 135 "shell.y"
                 {
-    printf("   Yacc: insert output \"%s\"\n", (yyvsp[0].cpp_string)->c_str());
+    printf("   Yacc: insert output and error \"%s\"\n", (yyvsp[0].cpp_string)->c_str());
     Shell::_currentCommand._outFile = (yyvsp[0].cpp_string);
     printf("here 1\n");
-    /*Shell::_currentCommand._errFile = $2;*/
+    Shell::_currentCommand._errFile = (yyvsp[0].cpp_string);
     printf("here 2\n");
-
   }
-#line 1216 "y.tab.cc"
+#line 1215 "y.tab.cc"
     break;
 
   case 24: /* iomodifier_opt: GREAT2 WORD  */
-#line 144 "shell.y"
+#line 143 "shell.y"
               {
     printf("   Yacc: insert stderr redirection \"%s\"\n", (yyvsp[0].cpp_string)->c_str());
     Shell::_currentCommand._errFile = (yyvsp[0].cpp_string);
   }
-#line 1225 "y.tab.cc"
+#line 1224 "y.tab.cc"
     break;
 
   case 25: /* iomodifier_opt: LESS WORD  */
-#line 149 "shell.y"
+#line 148 "shell.y"
             {
     printf("   Yacc: insert input \"%s\"\n", (yyvsp[0].cpp_string)->c_str());
     Shell::_currentCommand._inFile = (yyvsp[0].cpp_string);
   }
-#line 1234 "y.tab.cc"
+#line 1233 "y.tab.cc"
     break;
 
 
-#line 1238 "y.tab.cc"
+#line 1237 "y.tab.cc"
 
       default: break;
     }
@@ -1427,7 +1426,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 157 "shell.y"
+#line 156 "shell.y"
 
 
 void
