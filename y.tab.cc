@@ -1208,7 +1208,7 @@ yyreduce:
     printf("   Yacc: insert output \"%s\"\n", (yyvsp[0].cpp_string)->c_str());
     Shell::_currentCommand._outFile = (yyvsp[0].cpp_string);
     printf("here 1\n");
-    Shell::_currentCommand._errFile = (yyvsp[0].cpp_string);
+    /*Shell::_currentCommand._errFile = $2;*/
     printf("here 2\n");
 
   }
