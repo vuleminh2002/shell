@@ -103,9 +103,9 @@ enum yysymbol_kind_t
   YYSYMBOL_AMPERSAND = 7,                  /* AMPERSAND  */
   YYSYMBOL_LESS = 8,                       /* LESS  */
   YYSYMBOL_GREAT = 9,                      /* GREAT  */
-  YYSYMBOL_GREATAMP = 10,                  /* GREATAMP  */
+  YYSYMBOL_GREATAMPERSAND = 10,            /* GREATAMPERSAND  */
   YYSYMBOL_GREATGREAT = 11,                /* GREATGREAT  */
-  YYSYMBOL_GREATGREATAMP = 12,             /* GREATGREATAMP  */
+  YYSYMBOL_GREATGREATAMPERSAND = 12,       /* GREATGREATAMPERSAND  */
   YYSYMBOL_YYACCEPT = 13,                  /* $accept  */
   YYSYMBOL_goal = 14,                      /* goal  */
   YYSYMBOL_commands = 15,                  /* commands  */
@@ -536,11 +536,11 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
 static const char *const yytname[] =
 {
   "\"end of file\"", "error", "\"invalid token\"", "WORD", "NOTOKEN",
-  "NEWLINE", "PIPE", "AMPERSAND", "LESS", "GREAT", "GREATAMP",
-  "GREATGREAT", "GREATGREATAMP", "$accept", "goal", "commands", "command",
-  "simple_command", "pipe_list", "command_and_args", "argument_list",
-  "argument", "command_word", "io_modifier_list", "iomodifier_opt",
-  "background_opt", YY_NULLPTR
+  "NEWLINE", "PIPE", "AMPERSAND", "LESS", "GREAT", "GREATAMPERSAND",
+  "GREATGREAT", "GREATGREATAMPERSAND", "$accept", "goal", "commands",
+  "command", "simple_command", "pipe_list", "command_and_args",
+  "argument_list", "argument", "command_word", "io_modifier_list",
+  "iomodifier_opt", "background_opt", YY_NULLPTR
 };
 
 static const char *
@@ -1160,9 +1160,9 @@ yyreduce:
 #line 1161 "y.tab.cc"
     break;
 
-  case 20: /* iomodifier_opt: GREATAMP WORD  */
+  case 20: /* iomodifier_opt: GREATAMPERSAND WORD  */
 #line 111 "shell.y"
-                  {
+                        {
 	printf("   Yacc: insert output \"%s\"\n", (yyvsp[0].cpp_string)->c_str());
 	Shell::_currentCommand._outFile = (yyvsp[0].cpp_string);
 	Shell::_currentCommand._errFile = (yyvsp[0].cpp_string);
@@ -1180,9 +1180,9 @@ yyreduce:
 #line 1181 "y.tab.cc"
     break;
 
-  case 22: /* iomodifier_opt: GREATGREATAMP WORD  */
+  case 22: /* iomodifier_opt: GREATGREATAMPERSAND WORD  */
 #line 121 "shell.y"
-                       {
+                             {
 	printf("   Yacc: insert output \"%s\"\n", (yyvsp[0].cpp_string)->c_str());
 	Shell::_currentCommand._append = 1;
 	Shell::_currentCommand._outFile = (yyvsp[0].cpp_string);
