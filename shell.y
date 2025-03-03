@@ -117,6 +117,7 @@ iomodifier_opt:
   GREAT WORD {
     if (Shell::_currentCommand._outFile) {
       fprintf(stderr, "Ambiguous output redirect.\n");
+      yyclearin; // Clears current token to prevent further parsing
       yyerrok;
     } else {
       printf("   Yacc: insert output \"%s\"\n", $2->c_str());
@@ -127,6 +128,7 @@ iomodifier_opt:
   GREATGREATAMP WORD {
     if (Shell::_currentCommand._outFile || Shell::_currentCommand._errFile) {
       fprintf(stderr, "Ambiguous output redirect.\n");
+      yyclearin; // Clears current token to prevent further parsing
       yyerrok;
     } else {
       printf("   Yacc: insert stdout & stderr (append) to \"%s\"\n", $2->c_str());
@@ -139,6 +141,7 @@ iomodifier_opt:
   GREATGREAT WORD {
    if (Shell::_currentCommand._outFile) {
       fprintf(stderr, "Ambiguous output redirect.\n");
+      yyclearin; // Clears current token to prevent further parsing
       yyerrok;
     } else {
       printf("   Yacc: insert output \"%s\" (append)\n", $2->c_str());
@@ -150,6 +153,7 @@ iomodifier_opt:
   GREATAMP WORD {
     if (Shell::_currentCommand._outFile || Shell::_currentCommand._errFile) {
       fprintf(stderr, "Ambiguous output redirect.\n");
+      yyclearin; // Clears current token to prevent further parsing
       yyerrok;
     } else {
       printf("   Yacc: insert stdout & stderr to \"%s\"\n", $2->c_str());
@@ -161,6 +165,7 @@ iomodifier_opt:
   GREAT2 WORD {
      if (Shell::_currentCommand._errFile) {
       fprintf(stderr, "Ambiguous error redirect.\n");
+      yyclearin; // Clears current token to prevent further parsing
       yyerrok;
     } else {
       printf("   Yacc: insert stderr redirection \"%s\"\n", $2->c_str());
@@ -171,6 +176,7 @@ iomodifier_opt:
   LESS WORD {
     if (Shell::_currentCommand._inFile) {
       fprintf(stderr, "Ambiguous input redirect.\n");
+      yyclearin; // Clears current token to prevent further parsing
       yyerrok;
     } else {
       printf("   Yacc: insert input \"%s\"\n", $2->c_str());
