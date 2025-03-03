@@ -135,9 +135,9 @@ iomodifier_opt:
   GREATAMP WORD {
     printf("   Yacc: insert output \"%s\"\n", $2->c_str());
     Shell::_currentCommand._outFile = $2;
-    printf("here 1");
+    printf("here 1\n");
     Shell::_currentCommand._errFile = $2;
-    printf("here 2");
+    printf("here 2\n");
 
   }
   |
