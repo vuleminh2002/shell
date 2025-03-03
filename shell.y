@@ -76,7 +76,7 @@ command_and_args:
   ;
 
 /* Zero or more redirections, in any order */
-iomodifier_opt_list
+iomodifier_opt_list:
   iomodifier_opt_list iomodifier_opt
   | iomodifier_opt
   ;
