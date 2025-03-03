@@ -64,8 +64,8 @@ simple_command:
   ;
 
 pipline:
-  pipline PIPE command_and_args
-  | command_and_args
+  pipline PIPE command_and_args {printf("pipe1");}
+  | command_and_args {printf("pipe");}
   ;
 
 command_and_args:
