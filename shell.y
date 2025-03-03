@@ -65,11 +65,7 @@ simple_command:
 
 pipline:
   pipline PIPE command_and_args
-    printf ("added pipie2");
-
   | command_and_args
-    printf ("added pipie2");
-
   ;
 
 command_and_args:
