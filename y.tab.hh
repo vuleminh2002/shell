@@ -71,9 +71,9 @@ extern int yydebug;
     AMPERSAND = 262,               /* AMPERSAND  */
     LESS = 263,                    /* LESS  */
     GREAT = 264,                   /* GREAT  */
-    GREATAMPERSAND = 265,          /* GREATAMPERSAND  */
+    GREATAMP = 265,                /* GREATAMP  */
     GREATGREAT = 266,              /* GREATGREAT  */
-    GREATGREATAMPERSAND = 267      /* GREATGREATAMPERSAND  */
+    GREATGREATAMP = 267            /* GREATGREATAMP  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -89,9 +89,9 @@ extern int yydebug;
 #define AMPERSAND 262
 #define LESS 263
 #define GREAT 264
-#define GREATAMPERSAND 265
+#define GREATAMP 265
 #define GREATGREAT 266
-#define GREATGREATAMPERSAND 267
+#define GREATGREATAMP 267
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
