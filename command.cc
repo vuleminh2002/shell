@@ -26,7 +26,7 @@
 Command::Command() {
     // Initialize a new vector of Simple Commands
     _simpleCommands = std::vector<SimpleCommand *>();
-
+    _append = false;
     _outFile = NULL;
     _inFile = NULL;
     _errFile = NULL;

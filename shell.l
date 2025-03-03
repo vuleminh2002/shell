@@ -32,14 +32,44 @@ void myunputc(int c) {
   /* Discard spaces and tabs */
 }
 
-">" {
-  return GREAT;
+">>&" {
+  return GREATGREATAMP;
 }
 
+">>" {
+  return GREATGREAT;
+}
+
+">&" {
+  return GREATAMP;
+}
+
+"2>" { 
+  return GREAT2; 
+}
+">" { 
+  return GREAT; 
+}
+
+"<" { 
+  return LESS;
+}
+
+"|" { 
+  return PIPE; 
+}
+
+"&" { 
+  return AMPERSAND; 
+}
 
 
 [^ \t\n][^ \t\n]*  {
   /* Assume that file names have only alpha chars */
   yylval.cpp_string = new std::string(yytext);
   return WORD;
+}
+
+.  {
+    return NOTOKEN;
 }

@@ -28,7 +28,7 @@
 }
 
 %token <cpp_string> WORD
-%token NOTOKEN GREAT NEWLINE
+%token NOTOKEN GREAT NEWLINE GREAT2 GREATAMP GREATGREAT GREATGREATAMP PIPE LESS AMPERSAND
 
 %{
 //#define yylex yylex
@@ -55,7 +55,7 @@ command: simple_command
        ;
 
 simple_command:	
-  command_and_args iomodifier_opt NEWLINE {
+  pipline iomodifier_opt_list background NEWLINE {
     printf("   Yacc: Execute command\n");
     Shell::_currentCommand.execute();
   }
@@ -63,11 +63,26 @@ simple_command:
   | error NEWLINE { yyerrok; }
   ;
 
+pipline:
+  pipline PIPE command_and_args
+    printf ("added pipie2");
+
+  | command_and_args
+    printf ("added pipie2");
+
+  ;
+
 command_and_args:
   command_word argument_list {
     Shell::_currentCommand.
     insertSimpleCommand( Command::_currentSimpleCommand );
   }
+  ;
+
+/* Zero or more redirections, in any order */
+iomodifier_opt_list
+  iomodifier_opt_list iomodifier_opt
+  | iomodifier_opt
   ;
 
 argument_list:
@@ -90,13 +105,55 @@ command_word:
   }
   ;
 
+/* Optional background execution */
+
+background:
+/* empty */ {
+      Shell::_currentCommand._background = false;
+    }
+  | AMPERSAND {
+      Shell::_currentCommand._background = true;
+    }
+  ;
+
+/* List of possible modifier */
 iomodifier_opt:
   GREAT WORD {
     printf("   Yacc: insert output \"%s\"\n", $2->c_str());
     Shell::_currentCommand._outFile = $2;
   }
+  |
+  GREATGREATAMP WORD {
+    printf("   Yacc: insert output \"%s\"\n", $2->c_str());
+    Shell::_currentCommand._outFile = $2;
+    Shell::_currentCommand._errFile = $2;
+    Shell::_currentCommand._append = true;
+  }
+  |
+  GREATGREAT WORD {
+    printf("   Yacc: insert output \"%s\"\n", $2->c_str());
+    Shell::_currentCommand._outFile = $2;
+    Shell::_currentCommand._append = true;
+  }
+  |
+  GREATAMP WORD {
+    printf("   Yacc: insert output \"%s\"\n", $2->c_str());
+    Shell::_currentCommand._outFile = $2;
+    Shell::_currentCommand._errFile = $2;
+  }
+  |
+  GREAT2 WORD {
+    printf("   Yacc: insert stderr redirection \"%s\"\n", $2->c_str());
+    Shell::_currentCommand._errFile = $2;
+  }
+  |
+  LESS WORD {
+    printf("   Yacc: insert input \"%s\"\n", $2->c_str());
+    Shell::_currentCommand._inFile = $2;
+  }
   | /* can be empty */ 
   ;
+
 
 %%
 
