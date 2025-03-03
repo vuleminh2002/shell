@@ -64,8 +64,8 @@ simple_command:
   ;
 
 pipline:
-  pipline PIPE command_and_args {printf("pipe1");}
-  | command_and_args {printf("pipe");}
+  pipline PIPE command_and_args {printf("   Concac1\n"); }
+  | command_and_args {printf("   Concac2\n"); }
   ;
 
 command_and_args:
