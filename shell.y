@@ -28,7 +28,7 @@
 }
 
 %token <cpp_string> WORD
-%token NOTOKEN NEWLINE PIPE AMPERSAND LESS GREAT GREATAMP GREATGREAT GREATGREATAMP
+%token NOTOKEN NEWLINE PIPE AMPERSAND LESS GREAT GREATAMPERSAND GREATGREAT GREATGREATAMPERSAND
 
 %{
 //#define yylex yylex
@@ -108,7 +108,7 @@ iomodifier_opt:
     printf("   Yacc: insert output \"%s\"\n", $2->c_str());
     Shell::_currentCommand._outFile = $2;
   }
-  | GREATAMP WORD {
+  | GREATAMPERSAND WORD {
 	printf("   Yacc: insert output \"%s\"\n", $2->c_str());
 	Shell::_currentCommand._outFile = $2;
 	Shell::_currentCommand._errFile = $2;
@@ -118,7 +118,7 @@ iomodifier_opt:
 	Shell::_currentCommand._append = 1;
 	Shell::_currentCommand._outFile = $2;
   } 
-  | GREATGREATAMP WORD {
+  | GREATGREATAMPERSAND WORD {
 	printf("   Yacc: insert output \"%s\"\n", $2->c_str());
 	Shell::_currentCommand._append = 1;
 	Shell::_currentCommand._outFile = $2;
