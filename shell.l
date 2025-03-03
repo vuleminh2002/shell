@@ -4,8 +4,7 @@
  * CS-252 
  * shell.l: lexical analyzer for shell
  * You have to extend it.
- * Tokens: \n, \t, |, &, <, >, >&, >>, >>&
- * %token NOTOKEN NEWLINE PIPE AMPERSAND LESS GREAT GREATAMPERSAND GREATGREAT GREATGREATAMPERSAND
+ *
  */
 
 %{
@@ -21,6 +20,8 @@ void myunputc(int c) {
 
 %}
 
+%option noyywrap
+
 %%
 
 \n {
@@ -31,36 +32,38 @@ void myunputc(int c) {
   /* Discard spaces and tabs */
 }
 
-"|" {
-	return PIPE;
-}
-
-"&"	{
-	return AMPERSAND;
-}
-
-"<" {
-	return LESS;
-}
-
-">" {
-  return GREAT;
-}
-
-">&" {
-	return GREATAMPERSAND;
+">>&" {
+  return GREATGREATAMP;
 }
 
 ">>" {
-	return GREATGREAT;
+  return GREATGREAT;
 }
 
-">>&" {
-	return GREATGREATAMPERSAND;
+">&" {
+  return GREATAMP;
 }
 
+"2>" { 
+  return GREAT2; 
+}
+">" { 
+  return GREAT; 
+}
 
-[^ \t\n|><][^ \t\n|><]*  {
+"<" { 
+  return LESS;
+}
+
+"|" { 
+  return PIPE; 
+}
+
+"&" { 
+  return AMPERSAND; 
+}
+
+[^ \t\n|><][^ \t\n|><]*   {
   /* Assume that file names have only alpha chars */
   yylval.cpp_string = new std::string(yytext);
   return WORD;
@@ -69,7 +72,3 @@ void myunputc(int c) {
 .  {
     return NOTOKEN;
 }
-
-%%
-
-/*TODO: subshell, escape, quote*/
