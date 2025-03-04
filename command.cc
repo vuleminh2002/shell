@@ -63,7 +63,7 @@ void Command::clear() {
     if ( _errFile ) {
         delete _errFile;
     }
-    _errFile = NULL;
+    
     _append = false;
     _background = false;
 }
