@@ -520,7 +520,7 @@ static const yytype_uint8 yyrline[] =
 {
        0,    46,    46,    50,    51,    54,    58,    62,    63,    67,
       68,    72,    80,    81,    82,    86,    87,    91,    98,   108,
-     111,   118,   125,   134,   142,   150,   157
+     111,   118,   125,   134,   142,   150,   156
 };
 #endif
 
@@ -1116,25 +1116,13 @@ yyreduce:
 #line 1117 "y.tab.cc"
     break;
 
-  case 9: /* pipline: pipline PIPE command_and_args  */
-#line 67 "shell.y"
-                                {printf("   Con1\n"); }
-#line 1123 "y.tab.cc"
-    break;
-
-  case 10: /* pipline: command_and_args  */
-#line 68 "shell.y"
-                     {printf("   Con2\n"); }
-#line 1129 "y.tab.cc"
-    break;
-
   case 11: /* command_and_args: command_word argument_list  */
 #line 72 "shell.y"
                              {
     Shell::_currentCommand.
     insertSimpleCommand( Command::_currentSimpleCommand );
   }
-#line 1138 "y.tab.cc"
+#line 1126 "y.tab.cc"
     break;
 
   case 17: /* argument: WORD  */
@@ -1143,7 +1131,7 @@ yyreduce:
     printf("   Yacc: insert argument \"%s\"\n", (yyvsp[0].cpp_string)->c_str());
     Command::_currentSimpleCommand->insertArgument( (yyvsp[0].cpp_string) );\
   }
-#line 1147 "y.tab.cc"
+#line 1135 "y.tab.cc"
     break;
 
   case 18: /* command_word: WORD  */
@@ -1153,7 +1141,7 @@ yyreduce:
     Command::_currentSimpleCommand = new SimpleCommand();
     Command::_currentSimpleCommand->insertArgument( (yyvsp[0].cpp_string) );
   }
-#line 1157 "y.tab.cc"
+#line 1145 "y.tab.cc"
     break;
 
   case 19: /* background: %empty  */
@@ -1161,7 +1149,7 @@ yyreduce:
             {
       Shell::_currentCommand._background = false;
     }
-#line 1165 "y.tab.cc"
+#line 1153 "y.tab.cc"
     break;
 
   case 20: /* background: AMPERSAND  */
@@ -1169,7 +1157,7 @@ yyreduce:
               {
       Shell::_currentCommand._background = true;
     }
-#line 1173 "y.tab.cc"
+#line 1161 "y.tab.cc"
     break;
 
   case 21: /* iomodifier_opt: GREAT WORD  */
@@ -1179,7 +1167,7 @@ yyreduce:
       printf("   Yacc: insert output \"%s\"\n", (yyvsp[0].cpp_string)->c_str());
       Shell::_currentCommand._outFile = (yyvsp[0].cpp_string);
     }
-#line 1183 "y.tab.cc"
+#line 1171 "y.tab.cc"
     break;
 
   case 22: /* iomodifier_opt: GREATGREATAMP WORD  */
@@ -1191,7 +1179,7 @@ yyreduce:
       Shell::_currentCommand._errFile = (yyvsp[0].cpp_string);
       Shell::_currentCommand._append = true;
     }
-#line 1195 "y.tab.cc"
+#line 1183 "y.tab.cc"
     break;
 
   case 23: /* iomodifier_opt: GREATGREAT WORD  */
@@ -1202,7 +1190,7 @@ yyreduce:
       Shell::_currentCommand._outFile = (yyvsp[0].cpp_string);
       Shell::_currentCommand._append = true;
     }
-#line 1206 "y.tab.cc"
+#line 1194 "y.tab.cc"
     break;
 
   case 24: /* iomodifier_opt: GREATAMP WORD  */
@@ -1214,31 +1202,29 @@ yyreduce:
       Shell::_currentCommand._errFile = (yyvsp[0].cpp_string);
     
   }
-#line 1218 "y.tab.cc"
+#line 1206 "y.tab.cc"
     break;
 
   case 25: /* iomodifier_opt: GREAT2 WORD  */
 #line 150 "shell.y"
               {
-     
       printf("   Yacc: insert stderr redirection \"%s\"\n", (yyvsp[0].cpp_string)->c_str());
       Shell::_currentCommand._errFile = (yyvsp[0].cpp_string);
     }
-#line 1228 "y.tab.cc"
+#line 1215 "y.tab.cc"
     break;
 
   case 26: /* iomodifier_opt: LESS WORD  */
-#line 157 "shell.y"
+#line 156 "shell.y"
             {
-    
       printf("   Yacc: insert input \"%s\"\n", (yyvsp[0].cpp_string)->c_str());
       Shell::_currentCommand._inFile = (yyvsp[0].cpp_string);
     }
-#line 1238 "y.tab.cc"
+#line 1224 "y.tab.cc"
     break;
 
 
-#line 1242 "y.tab.cc"
+#line 1228 "y.tab.cc"
 
       default: break;
     }
@@ -1431,7 +1417,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 166 "shell.y"
+#line 163 "shell.y"
 
 
 void

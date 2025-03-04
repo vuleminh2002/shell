@@ -116,42 +116,34 @@ background:
 /* List of possible modifier */
 iomodifier_opt:
   GREAT WORD {
-
       printf("   Yacc: insert output \"%s\"\n", $2->c_str());
       Shell::_currentCommand._outFile = $2;
     }
   
   |
   GREATGREATAMP WORD {
- 
       printf("   Yacc: insert stdout & stderr (append) to \"%s\"\n", $2->c_str());
       Shell::_currentCommand._outFile = $2;
       Shell::_currentCommand._errFile = $2;
       Shell::_currentCommand._append = true;
     }
-  
   |
   GREATGREAT WORD {
-  
       printf("   Yacc: insert output \"%s\" (append)\n", $2->c_str());
       Shell::_currentCommand._outFile = $2;
       Shell::_currentCommand._append = true;
     }
-  
   |
   GREATAMP WORD {
-   
       printf("   Yacc: insert stdout & stderr to \"%s\"\n", $2->c_str());
-      /*Shell::_currentCommand._outFile = $2;*/
-      Shell::_currentCommand._errFile = $2;
-    
+      Shell::_currentCommand._outFile = $2;
+      Shell::_currentCommand._errFile = $2; 
   }
   |
   GREAT2 WORD {
       printf("   Yacc: insert stderr redirection \"%s\"\n", $2->c_str());
       Shell::_currentCommand._errFile = $2;
     }
-  
   |
   LESS WORD {
       printf("   Yacc: insert input \"%s\"\n", $2->c_str());
