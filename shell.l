@@ -59,6 +59,10 @@ void myunputc(int c) {
 	return GREATGREATAMP;
 }
 
+"2>" {
+  return GREAT2;
+}
+
 
 [^ \t\n|><][^ \t\n|><]*  {
   /* Assume that file names have only alpha chars */
