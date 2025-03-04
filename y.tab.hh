@@ -66,15 +66,15 @@ extern int yydebug;
     YYUNDEF = 257,                 /* "invalid token"  */
     WORD = 258,                    /* WORD  */
     NOTOKEN = 259,                 /* NOTOKEN  */
-    NEWLINE = 260,                 /* NEWLINE  */
-    PIPE = 261,                    /* PIPE  */
-    AMPERSAND = 262,               /* AMPERSAND  */
-    LESS = 263,                    /* LESS  */
-    GREAT = 264,                   /* GREAT  */
-    GREATAMP = 265,                /* GREATAMP  */
-    GREATGREAT = 266,              /* GREATGREAT  */
-    GREATGREATAMP = 267,           /* GREATGREATAMP  */
-    GREAT2 = 268                   /* GREAT2  */
+    GREAT = 260,                   /* GREAT  */
+    NEWLINE = 261,                 /* NEWLINE  */
+    GREAT2 = 262,                  /* GREAT2  */
+    GREATAMP = 263,                /* GREATAMP  */
+    GREATGREAT = 264,              /* GREATGREAT  */
+    GREATGREATAMP = 265,           /* GREATGREATAMP  */
+    PIPE = 266,                    /* PIPE  */
+    LESS = 267,                    /* LESS  */
+    AMPERSAND = 268                /* AMPERSAND  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -85,15 +85,15 @@ extern int yydebug;
 #define YYUNDEF 257
 #define WORD 258
 #define NOTOKEN 259
-#define NEWLINE 260
-#define PIPE 261
-#define AMPERSAND 262
-#define LESS 263
-#define GREAT 264
-#define GREATAMP 265
-#define GREATGREAT 266
-#define GREATGREATAMP 267
-#define GREAT2 268
+#define GREAT 260
+#define NEWLINE 261
+#define GREAT2 262
+#define GREATAMP 263
+#define GREATGREAT 264
+#define GREATGREATAMP 265
+#define PIPE 266
+#define LESS 267
+#define AMPERSAND 268
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED

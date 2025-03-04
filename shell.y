@@ -79,6 +79,7 @@ command_and_args:
 iomodifier_opt_list:
   iomodifier_opt_list iomodifier_opt
   | iomodifier_opt
+  | /* can be empty */
   ;
 
 argument_list:
@@ -115,69 +116,50 @@ background:
 /* List of possible modifier */
 iomodifier_opt:
   GREAT WORD {
-    if (Shell::_currentCommand._outFile) {
-      fprintf(stderr, "Ambiguous output redirect.\n");
-      yyerrok;
-    } else {
+
       printf("   Yacc: insert output \"%s\"\n", $2->c_str());
       Shell::_currentCommand._outFile = $2;
     }
-  }
+  
   |
   GREATGREATAMP WORD {
-    if (Shell::_currentCommand._outFile || Shell::_currentCommand._errFile) {
-      fprintf(stderr, "Ambiguous output redirect.\n");
-      yyerrok;
-    } else {
+ 
       printf("   Yacc: insert stdout & stderr (append) to \"%s\"\n", $2->c_str());
       Shell::_currentCommand._outFile = $2;
       Shell::_currentCommand._errFile = $2;
       Shell::_currentCommand._append = true;
     }
-  }
+  
   |
   GREATGREAT WORD {
-   if (Shell::_currentCommand._outFile) {
-      fprintf(stderr, "Ambiguous output redirect.\n");
-      yyerrok;
-    } else {
+  
       printf("   Yacc: insert output \"%s\" (append)\n", $2->c_str());
       Shell::_currentCommand._outFile = $2;
       Shell::_currentCommand._append = true;
     }
-  }
+  
   |
   GREATAMP WORD {
-    if (Shell::_currentCommand._outFile || Shell::_currentCommand._errFile) {
-      fprintf(stderr, "Ambiguous output redirect.\n");
-      yyerrok;
-    } else {
+   
       printf("   Yacc: insert stdout & stderr to \"%s\"\n", $2->c_str());
       /*Shell::_currentCommand._outFile = $2;*/
       Shell::_currentCommand._errFile = $2;
-    }
+    
   }
   |
   GREAT2 WORD {
-     if (Shell::_currentCommand._errFile) {
-      fprintf(stderr, "Ambiguous error redirect.\n");
-      yyerrok;
-    } else {
+     
       printf("   Yacc: insert stderr redirection \"%s\"\n", $2->c_str());
       Shell::_currentCommand._errFile = $2;
     }
-  }
+  
   |
   LESS WORD {
-    if (Shell::_currentCommand._inFile) {
-      fprintf(stderr, "Ambiguous input redirect.\n");
-      yyerrok;
-    } else {
+    
       printf("   Yacc: insert input \"%s\"\n", $2->c_str());
       Shell::_currentCommand._inFile = $2;
     }
-  }
-  | /* can be empty */ 
+
   ;
 
 
