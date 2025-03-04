@@ -1,4 +1,3 @@
-
 /*
  *
  * CS-252 
@@ -32,38 +31,36 @@ void myunputc(int c) {
   /* Discard spaces and tabs */
 }
 
-">>&" {
-  return GREATGREATAMP;
+"|" {
+	return PIPE;
 }
 
-">>" {
-  return GREATGREAT;
+"&"	{
+	return AMPERSAND;
+}
+
+"<" {
+	return LESS;
+}
+
+">" {
+  return GREAT;
 }
 
 ">&" {
-  return GREATAMP;
+	return GREATAMP;
 }
 
-"2>" { 
-  return GREAT2; 
-}
-">" { 
-  return GREAT; 
+">>" {
+	return GREATGREAT;
 }
 
-"<" { 
-  return LESS;
+">>&" {
+	return GREATGREATAMP;
 }
 
-"|" { 
-  return PIPE; 
-}
 
-"&" { 
-  return AMPERSAND; 
-}
-
-[^ \t\n|><][^ \t\n|><]*   {
+[^ \t\n|><][^ \t\n|><]*  {
   /* Assume that file names have only alpha chars */
   yylval.cpp_string = new std::string(yytext);
   return WORD;
@@ -72,3 +69,4 @@ void myunputc(int c) {
 .  {
     return NOTOKEN;
 }
+

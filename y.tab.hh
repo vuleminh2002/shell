@@ -73,7 +73,8 @@ extern int yydebug;
     GREAT = 264,                   /* GREAT  */
     GREATAMP = 265,                /* GREATAMP  */
     GREATGREAT = 266,              /* GREATGREAT  */
-    GREATGREATAMP = 267            /* GREATGREATAMP  */
+    GREATGREATAMP = 267,           /* GREATGREATAMP  */
+    GREAT2 = 268                   /* GREAT2  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -92,6 +93,7 @@ extern int yydebug;
 #define GREATAMP 265
 #define GREATGREAT 266
 #define GREATGREATAMP 267
+#define GREAT2 268
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -103,7 +105,7 @@ union YYSTYPE
   // Example of using a c++ type in yacc
   std::string *cpp_string;
 
-#line 107 "y.tab.hh"
+#line 109 "y.tab.hh"
 
 };
 typedef union YYSTYPE YYSTYPE;
