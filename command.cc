@@ -49,20 +49,25 @@ void Command::clear() {
     for (auto simpleCommand : _simpleCommands) {
         delete simpleCommand;
     }
-
-    if ( _outFile ) {
+    if (_errFile == _outFile) {
+        // free it once
         delete _outFile;
+        _outFile = nullptr;
+        _errFile = nullptr;
+    } else {
+        // free them separately
+        if (_outFile) { delete _outFile; }
+        _outFile = nullptr;
+        if (_errFile) { delete _errFile; }
+        _errFile = nullptr;
     }
-    _outFile = NULL;
-
+   
     if ( _inFile ) {
         delete _inFile;
     }
     _inFile = NULL;
 
-    if ( _errFile ) {
-        delete _errFile;
-    }
+
     
     _append = false;
     _background = false;

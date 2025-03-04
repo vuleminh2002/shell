@@ -136,9 +136,8 @@ iomodifier_opt:
   |
   GREATAMP WORD {
       printf("   Yacc: insert stdout & stderr to \"%s\"\n", $2->c_str());
-      std::string *filename = $2;
       Shell::_currentCommand._outFile = $2;
-      Shell::_currentCommand._errFile = filename; 
+      Shell::_currentCommand._errFile = $2; 
   }
   |
   GREAT2 WORD {
