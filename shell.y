@@ -64,8 +64,8 @@ simple_command:
   ;
 
 pipline:
-  pipline PIPE command_and_args {printf("   Con1\n"); }
-  | command_and_args {printf("   Con2\n"); }
+  pipline PIPE command_and_args
+  | command_and_args
   ;
 
 command_and_args:
@@ -148,18 +148,15 @@ iomodifier_opt:
   }
   |
   GREAT2 WORD {
-     
       printf("   Yacc: insert stderr redirection \"%s\"\n", $2->c_str());
       Shell::_currentCommand._errFile = $2;
     }
   
   |
   LESS WORD {
-    
       printf("   Yacc: insert input \"%s\"\n", $2->c_str());
       Shell::_currentCommand._inFile = $2;
     }
-
   ;
 
 
