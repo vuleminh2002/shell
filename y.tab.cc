@@ -1444,7 +1444,17 @@ yyerror(const char * s)
 #if 0
 main()
 {
-  yyparse();
+  while (true) {
+    if (parsing_error) {
+        parsing_error = 0;  // Reset error flag
+        continue;  // Skip prompt if last command had a parsing error
+    }
+
+    printf("myshell> ");
+    fflush(stdout);
+
+    yyparse();
+}
 }
 #endif
 
