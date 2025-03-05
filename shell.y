@@ -124,9 +124,9 @@ background:
 iomodifier_opt:
   GREAT WORD {
     if (Shell::_currentCommand._outFile != NULL ){
-      #ifdef PRINTING
+      
         fprintf(stderr, "Ambiguous output redirect.\n");
-      #endif
+      
 		    exit(0);
 	  }
     #ifdef PRINTING
@@ -138,9 +138,7 @@ iomodifier_opt:
   |
   GREATGREATAMP WORD {
       if (Shell::_currentCommand._outFile != NULL ){
-      #ifdef PRINTING
 		    printf("Ambiguous output redirect.\n");
-      #endif
 		    exit(0);
 	  }
     #ifdef PRINTING
@@ -153,9 +151,7 @@ iomodifier_opt:
   |
   GREATGREAT WORD {
       if (Shell::_currentCommand._outFile != NULL ){
-      #ifdef PRINTING
 		    printf("Ambiguous output redirect.\n");
-      #endif
 		    exit(0);
 	  }
     #ifdef PRINTING
@@ -167,9 +163,7 @@ iomodifier_opt:
   |
   GREATAMP WORD {
       if (Shell::_currentCommand._outFile != NULL ){
-      #ifdef PRINTING
 		    printf("Ambiguous output redirect.\n");
-      #endif
 		    exit(0);
 	  }
     #ifdef PRINTING
@@ -188,9 +182,7 @@ iomodifier_opt:
   |
   LESS WORD {
       if (Shell::_currentCommand._inFile != NULL ){
-      #ifdef PRINTING
 		    printf("Ambiguous output redirect.\n");
-      #endif
 		    exit(0);
 	  }
     #ifdef PRINTING
