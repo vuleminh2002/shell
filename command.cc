@@ -122,7 +122,7 @@ void Command::execute() {
     int fdout = 0; //fd index that holds output source
     int fderr = 0; // fd index that holds err source
 
-    printf("%d", _simpleCommands.size());
+    printf("size of simple command %zu\n", _simpleCommands.size());
 
     //Step 1: Setting up input
     if (_inFile) {
