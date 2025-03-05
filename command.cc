@@ -178,17 +178,18 @@ void Command::execute() {
                 if (_append) {
                     fdout = open (_outFile->c_str(), O_WRONLY | O_CREAT | O_APPEND, 0600);
                 }
-                } else {
+                 else {
                     fdout = open(_outFile->c_str(),
                                 O_WRONLY | O_CREAT | O_TRUNC,
                                 0600);
                 }
                 if (fdout < 0) {
                     perror("open (output)");
-                } else {
-                    // No output file -> use default stdout
-                    fdout = dup(defaultout);
-                    }
+                }
+            } else {
+                // No output file -> use default stdout
+                fdout = dup(defaultout);
+                }
             }
             else {//part 1b.3
                 //if it's not a last command create pipe
