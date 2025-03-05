@@ -130,7 +130,7 @@ void Command::execute() {
         fdin = open(_inFile->c_str(), O_RDONLY);
         if (fdin < 0) {
             printf("cmm khong mo duoc");
-            //perror("open intput");
+            perror("open intput");
         }
         else {
 
@@ -168,7 +168,7 @@ void Command::execute() {
     //step 3: Loop over simpleCommand
     for (size_t i = 0; i < _simpleCommands.size(); i++) {
         printf("got into the loop baby");
-        //dup2(fdin, 0);
+        dup2(fdin, 0);
         close(fdin);
         //if last SimpleCommand (process the output)
         if ( i == _simpleCommands.size() - 1) {
