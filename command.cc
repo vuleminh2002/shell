@@ -128,6 +128,8 @@ void Command::execute() {
     if (_inFile) {
         fdin = open(_inFile->c_str(), O_RDONLY);
         if (fdin < 0) {
+            
+        }
     }
     else {
 
@@ -162,7 +164,7 @@ void Command::execute() {
 
     //step 3: Loop over simpleCommand
     for (size_t i = 0; i < _simpleCommands.size(); i++) {
-        //printf("got into the loop ");
+        //printf("got into the loop baby");
         dup2(fdin, 0);
         close(fdin);
         //if last SimpleCommand (process the output)
@@ -220,11 +222,8 @@ void Command::execute() {
             _exit(1);
         }
     }
-    printf("got down into the loop baby");
 
-     // ------------------------------------------
     // 6) Restore in/out/err to defaults
-    // ------------------------------------------
     dup2(defaultin, 0);
     dup2(defaultout, 1);
     dup2(defaulterr, 2);
@@ -233,17 +232,13 @@ void Command::execute() {
     close(defaultout);
     close(defaulterr);
 
-    // ------------------------------------------
     // 7) If not background, wait for last command
-    // ------------------------------------------
+
     if (!_background) {
         waitpid(lastPid, nullptr, 0);
     }
 
     
-    
-    
-
     // Clear to prepare for next command
     clear();
 
@@ -251,4 +246,4 @@ void Command::execute() {
     Shell::prompt();
 }
 
-SimpleCommand * Command::_currentSimpleCommand;
+//SimpleCommand * Command::_currentSimpleCommand;
