@@ -136,7 +136,8 @@ void Command::execute() {
             fdin = dup(defaultin);
         }
     }
-
+    dup2(fdin, STDIN_FILENO);
+    close(fdin);  // Close after redirection!
     //Step 2: setup error 
     if (_errFile) {
         // if we have an error file, open for append or truncate
