@@ -132,11 +132,11 @@ void Command::execute() {
             printf("cmm khong mo duoc");
             perror("open intput");
         }
-        else {
+    }
+    else {
 
-            //if no input file -> use the default input
-            fdin = dup(defaultin);
-        }
+        //if no input file -> use the default input
+        fdin = dup(defaultin);
     }
  
     //Step 2: setup error 
