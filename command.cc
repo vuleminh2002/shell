@@ -122,19 +122,13 @@ void Command::execute() {
     int fdout = 0; //fd index that holds output source
     int fderr = 0; // fd index that holds err source
 
-    SimpleCommand *cmd = _simpleCommands.back();
-    // 3) Convert std::vector<std::string*> arguments into C-style argv
-    std::vector<char*> argv;
-    for (auto &argPtr : cmd->_arguments) {
-        argv.push_back(const_cast<char*>(argPtr->c_str()));
-    }
-    // Null-terminate for execvp()
-    argv.push_back(nullptr);
+
 
     //Step 1: Setting up input
     if (_inFile) {
         fdin = open(_inFile->c_str(), O_RDONLY);
         if (fdin < 0) {
+            printf("cmm khong mo duoc");
             perror("open intput");
         }
         else {
@@ -242,7 +236,7 @@ void Command::execute() {
     // ------------------------------------------
     // 7) If not background, wait for last command
     // ------------------------------------------
-    if (!_background && lastPid > 0) {
+    if (!_background) {
         waitpid(lastPid, nullptr, 0);
     }
 
