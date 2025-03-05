@@ -118,13 +118,13 @@ void Command::execute() {
     int defaultin = dup(0);
     int defaultout = dup(1);
     int defaulterr = dup(2);
-    if (fderr == -1) {
+    if (defaulterr == -1) {
         perror("dup(defaulterr) failed");
         exit(1);
     }
-    int fdin = 0; //holding input source
-    int fdout = 0; //fd index that holds output source
-    int fderr = 0; // fd index that holds err source
+    int fdin; //holding input source
+    int fdout; //fd index that holds output source
+    int fderr; // fd index that holds err source
 
     printf("size of simple command %zu\n", _simpleCommands.size());
 
