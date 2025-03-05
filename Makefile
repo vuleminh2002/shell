@@ -6,6 +6,10 @@ cc= gcc
 CC= g++
 ccFLAGS= -g -std=c11
 CCFLAGS= -g -std=c++17
+ifeq ($(PRINTING),1) <-- Add this
+    CCFLAGS += -DPRINTING
+    ccFLAGS += -DPRINTING
+endif
 WARNFLAGS= -Wall -Wextra -pedantic
 
 LEX=lex -l
