@@ -136,8 +136,7 @@ void Command::execute() {
             fdin = dup(defaultin);
         }
     }
-    dup2(fdin, STDIN_FILENO);
-    close(fdin);  // Close after redirection!
+ 
     //Step 2: setup error 
     if (_errFile) {
         // if we have an error file, open for append or truncate
@@ -165,6 +164,7 @@ void Command::execute() {
 
     //step 3: Loop over simpleCommand
     for (size_t i = 0; i < _simpleCommands.size(); i++) {
+        printf("got in here");
         dup2(fdin, 0);
         close(fdin);
         //if last SimpleCommand (process the output)
