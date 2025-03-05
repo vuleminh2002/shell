@@ -129,6 +129,8 @@ iomodifier_opt:
   GREATGREATAMP WORD {
       if (Shell::_currentCommand._outFile != NULL ){
 		  printf("Ambiguous output redirect.\n");
+      Shell::_currentCommand.clear();  // Reset command state
+
 		  exit(0);
 	  }
       printf("   Yacc: insert stdout & stderr (append) to \"%s\"\n", $2->c_str());
