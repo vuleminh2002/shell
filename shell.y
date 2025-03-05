@@ -117,10 +117,9 @@ background:
 iomodifier_opt:
   GREAT WORD {
       if (Shell::_currentCommand._outFile != NULL ){
-      fprintf(stderr, "Ambiguous output redirect.\n");
-      yyclearin;  // Discard remaining tokens
-      yyerrok; 
-		  exit(0);
+        fprintf(stderr, "Ambiguous output redirect.\n");
+        YYABORT;  // Abort parsing immediately
+		    exit(0);
 	  }
       printf("   Yacc: insert output \"%s\"\n", $2->c_str());
       Shell::_currentCommand._outFile = $2;
