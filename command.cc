@@ -163,11 +163,11 @@ void Command::execute() {
     close(fderr);
 
     int lastPid = -1;
-    printf("got  here baby");
+    printf("got  here ");
 
     //step 3: Loop over simpleCommand
     for (size_t i = 0; i < _simpleCommands.size(); i++) {
-        printf("got into the loop baby");
+        printf("got into the loop ");
         dup2(fdin, 0);
         close(fdin);
         //if last SimpleCommand (process the output)
