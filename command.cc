@@ -123,15 +123,11 @@ void Command::execute() {
     int fdout = 0;  // Will hold next command's output destination
     int fderr = 0;  // fd index that holds err source
 
-    printf("size of simple command %zu\n", _simpleCommands.size());
 
     //Step 1: Setting up input
     if (_inFile) {
         fdin = open(_inFile->c_str(), O_RDONLY);
         if (fdin < 0) {
-            printf("cmm khong mo duoc");
-            perror("open intput");
-        }
     }
     else {
 
@@ -163,11 +159,10 @@ void Command::execute() {
     close(fderr);
 
     int lastPid = -1;
-    printf("got  here ");
 
     //step 3: Loop over simpleCommand
     for (size_t i = 0; i < _simpleCommands.size(); i++) {
-        printf("got into the loop ");
+        //printf("got into the loop ");
         dup2(fdin, 0);
         close(fdin);
         //if last SimpleCommand (process the output)
