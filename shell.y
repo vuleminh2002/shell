@@ -116,12 +116,20 @@ background:
 /* List of possible modifier */
 iomodifier_opt:
   GREAT WORD {
+      if (Shell::_currentCommand._outFile != NULL ){
+		  printf("Ambiguous output redirect.\n");
+		  exit(0);
+	  }
       printf("   Yacc: insert output \"%s\"\n", $2->c_str());
       Shell::_currentCommand._outFile = $2;
     }
   
   |
   GREATGREATAMP WORD {
+      if (Shell::_currentCommand._outFile != NULL ){
+		  printf("Ambiguous output redirect.\n");
+		  exit(0);
+	  }
       printf("   Yacc: insert stdout & stderr (append) to \"%s\"\n", $2->c_str());
       Shell::_currentCommand._outFile = $2;
       Shell::_currentCommand._errFile = $2;
@@ -129,23 +137,39 @@ iomodifier_opt:
     }
   |
   GREATGREAT WORD {
+      if (Shell::_currentCommand._outFile != NULL ){
+		  printf("Ambiguous output redirect.\n");
+		  exit(0);
+	  }
       printf("   Yacc: insert output \"%s\" (append)\n", $2->c_str());
       Shell::_currentCommand._outFile = $2;
       Shell::_currentCommand._append = true;
     }
   |
   GREATAMP WORD {
+      if (Shell::_currentCommand._outFile != NULL ){
+		  printf("Ambiguous output redirect.\n");
+		  exit(0);
+	  }
       printf("   Yacc: insert stdout & stderr to \"%s\"\n", $2->c_str());
       Shell::_currentCommand._outFile = $2;
       Shell::_currentCommand._errFile = $2; 
   }
   |
   GREAT2 WORD {
+      if (Shell::_currentCommand._errFile != NULL ){
+		  printf("Ambiguous output redirect.\n");
+		  exit(0);
+	  }
       printf("   Yacc: insert stderr redirection \"%s\"\n", $2->c_str());
       Shell::_currentCommand._errFile = $2;
     }
   |
   LESS WORD {
+      if (Shell::_currentCommand._inFile != NULL ){
+		  printf("Ambiguous output redirect.\n");
+		  exit(0);
+	  }
       printf("   Yacc: insert input \"%s\"\n", $2->c_str());
       Shell::_currentCommand._inFile = $2;
     }
