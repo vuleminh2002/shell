@@ -122,7 +122,7 @@ void Command::execute() {
     int fdout = 0; //fd index that holds output source
     int fderr = 0; // fd index that holds err source
 
-
+    printf("%d", _simpleCommands.size());
 
     //Step 1: Setting up input
     if (_inFile) {
@@ -164,7 +164,7 @@ void Command::execute() {
 
     //step 3: Loop over simpleCommand
     for (size_t i = 0; i < _simpleCommands.size(); i++) {
-        printf("got in here");
+        
         dup2(fdin, 0);
         close(fdin);
         //if last SimpleCommand (process the output)
