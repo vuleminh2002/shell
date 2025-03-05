@@ -16,9 +16,10 @@
 
 #include <cstdio>
 #include <cstdlib>
-
+#include <fcntl.h>     // open, O_ flags
+#include <sys/wait.h>
 #include <iostream>
-
+#include <unistd.h>
 #include "command.hh"
 #include "shell.hh"
 
@@ -112,6 +113,141 @@ void Command::execute() {
     // For every simple command fork a new process
     // Setup i/o redirection
     // and call exec
+    //1b.1
+    int defaultin = dup(0);
+    int defaultout = dup(1);
+    int defaulterr = dup(2);
+
+    int fdin = 0; //holding input source
+    int fdout = 0; //fd index that holds output source
+    int fderr = 0; // fd index that holds err source
+
+    SimpleCommand *cmd = _simpleCommands.back();
+    // 3) Convert std::vector<std::string*> arguments into C-style argv
+    std::vector<char*> argv;
+    for (auto &argPtr : cmd->_arguments) {
+        argv.push_back(const_cast<char*>(argPtr->c_str()));
+    }
+    // Null-terminate for execvp()
+    argv.push_back(nullptr);
+
+    //Step 1: Setting up input
+    if (_inFile) {
+        fdin = open(_inFile->c_str(), O_RDONLY);
+        if (fdin < 0) {
+            perror("open intput");
+        }
+        else {
+            //if no input file -> use the default input
+            fdin = dup(defaultin);
+        }
+    }
+
+    //Step 2: setup error 
+    if (_errFile) {
+        // if we have an error file, open for append or truncate
+        if (_append) {
+            fderr = open(_errFile->c_str(),
+                         O_WRONLY | O_CREAT | O_APPEND,
+                         0600);
+        } else {
+            fderr = open(_errFile->c_str(),
+                         O_WRONLY | O_CREAT | O_TRUNC,
+                         0600);
+        }
+        if (fderr < 0) {
+            perror("open (error)");
+            // again, handle or continue
+        }
+    } else {
+        // No error file -> default error
+        fderr = dup(defaulterr);
+    }
+    dup2(fderr, 2);
+    close(fderr);
+
+    int lastPid = -1;
+
+    //step 3: Loop over simpleCommand
+    for (size_t i = 0; i < _simpleCommands.size(); i++) {
+        dup2(fdin, 0);
+        close(fdin);
+        //if last SimpleCommand (process the output)
+        if ( i == _simpleCommands.size() - 1) {
+            if (_outFile) {
+                if (_append) {
+                    fdout = open (_outFile->c_str(), O_WRONLY | O_CREAT | O_APPEND, 0600);
+                }
+                } else {
+                    fdout = open(_outFile->c_str(),
+                                O_WRONLY | O_CREAT | O_TRUNC,
+                                0600);
+                }
+                if (fdout < 0) {
+                    perror("open (output)");
+                } else {
+                    // No output file -> use default stdout
+                    fdout = dup(defaultout);
+                    }
+            }
+            else {//part 1b.3
+                //if it's not a last command create pipe
+                printf("pipe handle later");
+            }
+
+        dup2(fdout, 1);
+        close(fdout); 
+
+
+        //Step 4: fork a child.
+        lastPid = fork();
+
+        if (lastPid < 0) {
+            //if error occurs on fork
+            perror("fork");
+            exit(2);
+        }
+        if (lastPid == 0) {
+            // CHILD PROCESS
+
+            // Convert arguments from std::vector<std::string*> to char* array
+            SimpleCommand *scmd = _simpleCommands[i];
+            size_t argCount = scmd->_arguments.size();
+            char **argv = new char*[argCount + 1];
+            for (size_t j = 0; j < argCount; j++) {
+                argv[j] = const_cast<char*>(scmd->_arguments[j]->c_str());
+            }
+            argv[argCount] = nullptr;
+            
+            // execvp
+            execvp(argv[0], argv);
+            // If execvp returns, error occurred
+            perror("execvp");
+            _exit(1);
+        }
+    }
+
+     // ------------------------------------------
+    // 6) Restore in/out/err to defaults
+    // ------------------------------------------
+    dup2(defaultin, 0);
+    dup2(defaultout, 1);
+    dup2(defaulterr, 2);
+
+    close(defaultin);
+    close(defaultout);
+    close(defaulterr);
+
+    // ------------------------------------------
+    // 7) If not background, wait for last command
+    // ------------------------------------------
+    if (!_background && lastPid > 0) {
+        waitpid(lastPid, nullptr, 0);
+    }
+
+    
+    
+    
 
     // Clear to prepare for next command
     clear();
