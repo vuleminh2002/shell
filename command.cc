@@ -111,6 +111,7 @@ void Command::execute() {
     #ifdef PRINTING
         print();
     #endif
+    
     // Add execution here
     // For every simple command fork a new process
     // Setup i/o redirection

@@ -101,7 +101,9 @@ argument:
 
 command_word:
   WORD {
-    printf("   Yacc: insert command \"%s\"\n", $1->c_str());
+    #ifdef PRINTING
+      printf("   Yacc: insert command \"%s\"\n", $1->c_str());
+    #endif
     Command::_currentSimpleCommand = new SimpleCommand();
     Command::_currentSimpleCommand->insertArgument( $1 );
   }
@@ -122,20 +124,28 @@ background:
 iomodifier_opt:
   GREAT WORD {
     if (Shell::_currentCommand._outFile != NULL ){
+      #ifdef PRINTING
         fprintf(stderr, "Ambiguous output redirect.\n");
+      #endif
 		    exit(0);
 	  }
+    #ifdef PRINTING
       printf("   Yacc: insert output \"%s\"\n", $2->c_str());
+    #endif
       Shell::_currentCommand._outFile = $2;
     }
   
   |
   GREATGREATAMP WORD {
       if (Shell::_currentCommand._outFile != NULL ){
+      #ifdef PRINTING
 		    printf("Ambiguous output redirect.\n");
+      #endif
 		    exit(0);
 	  }
+    #ifdef PRINTING
       printf("   Yacc: insert stdout & stderr (append) to \"%s\"\n", $2->c_str());
+    #endif
       Shell::_currentCommand._outFile = $2;
       Shell::_currentCommand._errFile = $2;
       Shell::_currentCommand._append = true;
@@ -143,35 +153,49 @@ iomodifier_opt:
   |
   GREATGREAT WORD {
       if (Shell::_currentCommand._outFile != NULL ){
+      #ifdef PRINTING
 		    printf("Ambiguous output redirect.\n");
+      #endif
 		    exit(0);
 	  }
+    #ifdef PRINTING
       printf("   Yacc: insert output \"%s\" (append)\n", $2->c_str());
+    #endif
       Shell::_currentCommand._outFile = $2;
       Shell::_currentCommand._append = true;
     }
   |
   GREATAMP WORD {
       if (Shell::_currentCommand._outFile != NULL ){
+      #ifdef PRINTING
 		    printf("Ambiguous output redirect.\n");
+      #endif
 		    exit(0);
 	  }
+    #ifdef PRINTING
       printf("   Yacc: insert stdout & stderr to \"%s\"\n", $2->c_str());
+    #endif
       Shell::_currentCommand._outFile = $2;
       Shell::_currentCommand._errFile = $2; 
   }
   |
   GREAT2 WORD {
+    #ifdef PRINTING
       printf("   Yacc: insert stderr redirection \"%s\"\n", $2->c_str());
+    #endif
       Shell::_currentCommand._errFile = $2;
     }
   |
   LESS WORD {
       if (Shell::_currentCommand._inFile != NULL ){
+      #ifdef PRINTING
 		    printf("Ambiguous output redirect.\n");
+      #endif
 		    exit(0);
 	  }
+    #ifdef PRINTING
       printf("   Yacc: insert input \"%s\"\n", $2->c_str());
+    #endif
       Shell::_currentCommand._inFile = $2;
     }
   ;
@@ -182,7 +206,9 @@ iomodifier_opt:
 void
 yyerror(const char * s)
 {
+#ifdef PRINTING
   fprintf(stderr,"%s", s);
+#endif
 }
 
 #if 0
