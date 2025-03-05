@@ -5,7 +5,9 @@
 int yyparse(void);
 
 void Shell::prompt() {
-  printf("myshell>");
+  #ifdef PRINTING
+    printf("myshell>");
+  #ifdef PRINTING
   fflush(stdout);
 }
 
