@@ -118,13 +118,10 @@ void Command::execute() {
     int defaultin = dup(0);
     int defaultout = dup(1);
     int defaulterr = dup(2);
-    if (defaulterr == -1) {
-        perror("dup(defaulterr) failed");
-        exit(1);
-    }
-    int fdin; //holding input source
-    int fdout; //fd index that holds output source
-    int fderr; // fd index that holds err source
+
+    int fdin  = 0;  // Will hold next command's input source
+    int fdout = 0;  // Will hold next command's output destination
+    int fderr = 0;  // fd index that holds err source
 
     printf("size of simple command %zu\n", _simpleCommands.size());
 
@@ -171,7 +168,7 @@ void Command::execute() {
     //step 3: Loop over simpleCommand
     for (size_t i = 0; i < _simpleCommands.size(); i++) {
         printf("got into the loop baby");
-        dup2(fdin, 0);
+        //dup2(fdin, 0);
         close(fdin);
         //if last SimpleCommand (process the output)
         if ( i == _simpleCommands.size() - 1) {
