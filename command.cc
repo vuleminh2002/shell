@@ -161,6 +161,7 @@ void Command::execute() {
     close(fderr);
 
     int lastPid = -1;
+    printf("got  here baby");
 
     //step 3: Loop over simpleCommand
     for (size_t i = 0; i < _simpleCommands.size(); i++) {
@@ -222,6 +223,7 @@ void Command::execute() {
             _exit(1);
         }
     }
+    printf("got down into the loop baby");
 
      // ------------------------------------------
     // 6) Restore in/out/err to defaults
