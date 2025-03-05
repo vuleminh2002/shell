@@ -164,7 +164,7 @@ void Command::execute() {
 
     //step 3: Loop over simpleCommand
     for (size_t i = 0; i < _simpleCommands.size(); i++) {
-        printf("got into the loop baby")
+        printf("got into the loop baby");
         dup2(fdin, 0);
         close(fdin);
         //if last SimpleCommand (process the output)
