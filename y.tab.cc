@@ -133,9 +133,10 @@ typedef enum yysymbol_kind_t yysymbol_kind_t;
 
 void yyerror(const char * s);
 int yylex();
+SimpleCommand * Command::_currentSimpleCommand;
 
 
-#line 139 "y.tab.cc"
+#line 140 "y.tab.cc"
 
 
 #ifdef short
@@ -518,9 +519,9 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    46,    46,    50,    51,    54,    58,    62,    63,    67,
-      68,    72,    80,    81,    82,    86,    87,    91,    98,   108,
-     111,   118,   128,   139,   149,   159,   164
+       0,    47,    47,    51,    52,    55,    59,    63,    64,    68,
+      69,    73,    81,    82,    83,    87,    88,    92,    99,   109,
+     112,   119,   129,   140,   150,   160,   165
 };
 #endif
 
@@ -1102,66 +1103,66 @@ yyreduce:
   switch (yyn)
     {
   case 6: /* simple_command: pipline iomodifier_opt_list background NEWLINE  */
-#line 58 "shell.y"
+#line 59 "shell.y"
                                                  {
     //printf("   Yacc: Execute command\n");
     Shell::_currentCommand.execute();
   }
-#line 1111 "y.tab.cc"
+#line 1112 "y.tab.cc"
     break;
 
   case 8: /* simple_command: error NEWLINE  */
-#line 63 "shell.y"
+#line 64 "shell.y"
                   { yyerrok; }
-#line 1117 "y.tab.cc"
+#line 1118 "y.tab.cc"
     break;
 
   case 11: /* command_and_args: command_word argument_list  */
-#line 72 "shell.y"
+#line 73 "shell.y"
                              {
     Shell::_currentCommand.
     insertSimpleCommand( Command::_currentSimpleCommand );
   }
-#line 1126 "y.tab.cc"
+#line 1127 "y.tab.cc"
     break;
 
   case 17: /* argument: WORD  */
-#line 91 "shell.y"
+#line 92 "shell.y"
        {
     //printf("   Yacc: insert argument \"%s\"\n", $1->c_str());
     Command::_currentSimpleCommand->insertArgument( (yyvsp[0].cpp_string) );\
   }
-#line 1135 "y.tab.cc"
+#line 1136 "y.tab.cc"
     break;
 
   case 18: /* command_word: WORD  */
-#line 98 "shell.y"
+#line 99 "shell.y"
        {
     //printf("   Yacc: insert command \"%s\"\n", $1->c_str());
     Command::_currentSimpleCommand = new SimpleCommand();
     Command::_currentSimpleCommand->insertArgument( (yyvsp[0].cpp_string) );
   }
-#line 1145 "y.tab.cc"
+#line 1146 "y.tab.cc"
     break;
 
   case 19: /* background: %empty  */
-#line 108 "shell.y"
+#line 109 "shell.y"
             {
       Shell::_currentCommand._background = false;
     }
-#line 1153 "y.tab.cc"
+#line 1154 "y.tab.cc"
     break;
 
   case 20: /* background: AMPERSAND  */
-#line 111 "shell.y"
+#line 112 "shell.y"
               {
       Shell::_currentCommand._background = true;
     }
-#line 1161 "y.tab.cc"
+#line 1162 "y.tab.cc"
     break;
 
   case 21: /* iomodifier_opt: GREAT WORD  */
-#line 118 "shell.y"
+#line 119 "shell.y"
              {
     if (Shell::_currentCommand._outFile != NULL ){
         fprintf(stderr, "Ambiguous output redirect.\n");
@@ -1170,11 +1171,11 @@ yyreduce:
       //printf("   Yacc: insert output \"%s\"\n", $2->c_str());
       Shell::_currentCommand._outFile = (yyvsp[0].cpp_string);
     }
-#line 1174 "y.tab.cc"
+#line 1175 "y.tab.cc"
     break;
 
   case 22: /* iomodifier_opt: GREATGREATAMP WORD  */
-#line 128 "shell.y"
+#line 129 "shell.y"
                      {
       if (Shell::_currentCommand._outFile != NULL ){
 		    printf("Ambiguous output redirect.\n");
@@ -1185,11 +1186,11 @@ yyreduce:
       Shell::_currentCommand._errFile = (yyvsp[0].cpp_string);
       Shell::_currentCommand._append = true;
     }
-#line 1189 "y.tab.cc"
+#line 1190 "y.tab.cc"
     break;
 
   case 23: /* iomodifier_opt: GREATGREAT WORD  */
-#line 139 "shell.y"
+#line 140 "shell.y"
                   {
       if (Shell::_currentCommand._outFile != NULL ){
 		    printf("Ambiguous output redirect.\n");
@@ -1199,11 +1200,11 @@ yyreduce:
       Shell::_currentCommand._outFile = (yyvsp[0].cpp_string);
       Shell::_currentCommand._append = true;
     }
-#line 1203 "y.tab.cc"
+#line 1204 "y.tab.cc"
     break;
 
   case 24: /* iomodifier_opt: GREATAMP WORD  */
-#line 149 "shell.y"
+#line 150 "shell.y"
                 {
       if (Shell::_currentCommand._outFile != NULL ){
 		    printf("Ambiguous output redirect.\n");
@@ -1213,20 +1214,20 @@ yyreduce:
       Shell::_currentCommand._outFile = (yyvsp[0].cpp_string);
       Shell::_currentCommand._errFile = (yyvsp[0].cpp_string); 
   }
-#line 1217 "y.tab.cc"
+#line 1218 "y.tab.cc"
     break;
 
   case 25: /* iomodifier_opt: GREAT2 WORD  */
-#line 159 "shell.y"
+#line 160 "shell.y"
               {
       //printf("   Yacc: insert stderr redirection \"%s\"\n", $2->c_str());
       Shell::_currentCommand._errFile = (yyvsp[0].cpp_string);
     }
-#line 1226 "y.tab.cc"
+#line 1227 "y.tab.cc"
     break;
 
   case 26: /* iomodifier_opt: LESS WORD  */
-#line 164 "shell.y"
+#line 165 "shell.y"
             {
       if (Shell::_currentCommand._inFile != NULL ){
 		    printf("Ambiguous output redirect.\n");
@@ -1235,11 +1236,11 @@ yyreduce:
       //printf("   Yacc: insert input \"%s\"\n", $2->c_str());
       Shell::_currentCommand._inFile = (yyvsp[0].cpp_string);
     }
-#line 1239 "y.tab.cc"
+#line 1240 "y.tab.cc"
     break;
 
 
-#line 1243 "y.tab.cc"
+#line 1244 "y.tab.cc"
 
       default: break;
     }
@@ -1432,7 +1433,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 175 "shell.y"
+#line 176 "shell.y"
 
 
 void

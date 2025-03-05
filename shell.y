@@ -37,7 +37,6 @@
 
 void yyerror(const char * s);
 int yylex();
-SimpleCommand * Command::_currentSimpleCommand;
 
 %}
 
