@@ -129,9 +129,11 @@ void Command::execute() {
         fdin = open(_inFile->c_str(), O_RDONLY);
         if (fdin < 0) {
             printf("cmm khong mo duoc");
-            perror("open intput");
+            //perror("open intput");
         }
         else {
+            printf("cmm khong");
+
             //if no input file -> use the default input
             fdin = dup(defaultin);
         }
