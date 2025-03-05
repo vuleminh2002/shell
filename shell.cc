@@ -1,7 +1,7 @@
 #include <cstdio>
 
 #include "shell.hh"
-#ifdef PRINTING
+
 int yyparse(void);
 
 void Shell::prompt() {
@@ -15,4 +15,4 @@ int main() {
 }
 
 Command Shell::_currentCommand;
-  #endif  
+ 

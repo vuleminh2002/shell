@@ -1,5 +1,5 @@
 
-#ifdef PRINTING
+
 /*
  * CS-252
  * shell.y: parser for shell
@@ -57,7 +57,9 @@ command: simple_command
 
 simple_command:	
   pipline iomodifier_opt_list background NEWLINE {
-    printf("   Yacc: Execute command\n");
+    #ifdef PRINTING
+      printf("   Yacc: Execute command\n");
+    #endif
     Shell::_currentCommand.execute();
   }
   | NEWLINE 
@@ -90,7 +92,9 @@ argument_list:
 
 argument:
   WORD {
-    //printf("   Yacc: insert argument \"%s\"\n", $1->c_str());
+    #ifdef PRINTING
+      printf("   Yacc: insert argument \"%s\"\n", $1->c_str());
+    #endif
     Command::_currentSimpleCommand->insertArgument( $1 );\
   }
   ;
@@ -188,6 +192,6 @@ main()
 }
 #endif
 
-#endif
+
 
 
