@@ -128,7 +128,6 @@ void Command::execute() {
     if (_inFile) {
         fdin = open(_inFile->c_str(), O_RDONLY);
         if (fdin < 0) {
-            
         }
     }
     else {
