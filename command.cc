@@ -188,10 +188,14 @@ void Command::execute() {
                 }
             }
             else {//part 1b.3
+                 // Not the last command => create a pipe
                 int fdpipe[2];
-                pipe(fdpipe);
-                fdout = fdpipe[1];
-                fdin = fdpipe[0];    
+                if (pipe(fdpipe) == -1) {
+                    perror("pipe");
+                    exit(2);
+            }
+                fdout = fdpipe[1];   // current command writes to fdpipe[1]
+                fdin  = fdpipe[0];    
             }
 
         dup2(fdout, 1);
