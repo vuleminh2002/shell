@@ -188,8 +188,10 @@ void Command::execute() {
                 }
             }
             else {//part 1b.3
-                //if it's not a last command create pipe
-                printf("pipe handle later");
+                int fdpipe[2];
+                pipe(fdpipe);
+                fdout = fdpipe[1];
+                fdin = fdpipe[0];    
             }
 
         dup2(fdout, 1);
