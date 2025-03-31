@@ -25,7 +25,7 @@ void Shell::prompt() {
 int main() {
 
   //2.1 ctr+c handler
-  struct sigaction sigCtrl;
+  struct sigaction sa;
 	sa.sa_handler = ctrlC;
 	sigemptyset(&sa.sa_mask);
 	sigCtrl.sa_flags = SA_RESTART;
