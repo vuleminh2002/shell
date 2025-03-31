@@ -224,11 +224,6 @@ void Command::execute() {
             
             // execvp
             execvp(argv[0], argv);
-            for (int i = 0; i < argCount; ++i) {
-                delete[] argv[i];  // delete each string
-            }
-            delete[] argv;
-            // If execvp returns, error occurred
             perror("execvp");
             _exit(1);
         }
