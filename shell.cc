@@ -20,7 +20,7 @@ extern "C" void zombieHandler(int sig){
   int pid = wait3(0, 0, NULL);
 
 	while (waitpid(-1, NULL, WNOHANG) > 0) {};
-	  printf("[%d] exited.\n", pid);
+	  //printf("[%d] exited.\n", pid);
 }
 
 
