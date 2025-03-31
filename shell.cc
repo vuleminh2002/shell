@@ -9,7 +9,11 @@
 //void yyrestart(FILE * file);
 int yyparse(void);
 
-
+extern "C" void ctrlC(int sig) {
+	//fflush(stdin);
+	write(STDOUT_FILENO, "\n", 1);
+	Shell::prompt();
+}
 
 void Shell::prompt() {
   #ifdef PRINTING
@@ -20,7 +24,16 @@ void Shell::prompt() {
 
 int main() {
 
+  //2.1 ctr+c handler
+  struct sigaction sa;
+	sa.sa_handler = ctrlC;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART;
 
+	if (sigaction(SIGINT, &sa, NULL)) {
+		perror("sigaction");
+		exit(2);
+	}
 
 
   Shell::prompt();
