@@ -63,7 +63,7 @@ void myunputc(int c) {
   return GREAT2;
 }
 /*2.4 quote*/
-[\"([^\"\n]*)\"] {
+\"([^\"\n]*)\" {
   /*matching quote*/
   yylval.cpp_string = new std::string(yytext + 1, yyleng - 2);
   return WORD;
