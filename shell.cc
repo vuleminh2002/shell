@@ -1,7 +1,7 @@
 #include <cstdio>
 
 #include "shell.hh"
-
+void yyrestart(FILE * file);
 int yyparse(void);
 
 extern "C" void ctrlC(int sig) {
