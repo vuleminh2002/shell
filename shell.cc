@@ -6,7 +6,7 @@ int yyparse(void);
 
 extern "C" void ctrlC(int sig) {
 	//fflush(stdin);
-	fprintf("\n");
+	printf("\n");
 	Shell::prompt();
 }
 
