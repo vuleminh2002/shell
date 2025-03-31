@@ -134,7 +134,7 @@ void Command::execute() {
     }
     else {
 
-        //if no input file -> use the default input
+        //if no input file, use the default input
         fdin = dup(defaultin);
     }
  
@@ -195,12 +195,12 @@ void Command::execute() {
                     exit(2);
             }
                 fdout = fdpipe[1];   // current command writes to fdpipe[1]
-                fdin  = fdpipe[0];    
+                fdin  = fdpipe[0];    //assign fdin for the next command
             }
 
         dup2(fdout, 1);
         close(fdout); 
-
+      
 
         //Step 4: fork a child.
         lastPid = fork();
@@ -224,6 +224,10 @@ void Command::execute() {
             
             // execvp
             execvp(argv[0], argv);
+            for (int i = 0; i < argCount; ++i) {
+                delete[] argv[i];  // delete each string
+            }
+            delete[] argv;
             // If execvp returns, error occurred
             perror("execvp");
             _exit(1);
