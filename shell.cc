@@ -29,7 +29,7 @@ extern "C" void zombieHandler(int sig){
 	//TODO: Only analysize signal if background flag is true
 	struct sigaction sigZombie;
 
-		sigZombie.sa_handler = zombie;
+		sigZombie.sa_handler = zombieHandler;
 		sigemptyset(&sigZombie.sa_mask);
 		sigZombie.sa_flags = SA_RESTART | SA_NOCLDSTOP;
 		if (sigaction(SIGCHLD, &sigZombie, NULL)) {
