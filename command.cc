@@ -241,6 +241,7 @@ void Command::execute() {
     // 7) If not background, wait for last command
 
     if (!_background) {
+        printf("dcmm\n")
         waitpid(lastPid, nullptr, 0);
     }
 
