@@ -102,7 +102,7 @@ argument:
 command_word:
   WORD {
   //2.3: Exit
-	if ( strcmp($1, "exit") == 0 ) {
+	if ( *$1, "exit" == 0 ) {
 		printf("Good Bye!!\n");
 		exit(1);
 	}
