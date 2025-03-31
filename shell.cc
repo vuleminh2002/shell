@@ -28,7 +28,7 @@ int main() {
   struct sigaction sa;
 	sa.sa_handler = ctrlC;
 	sigemptyset(&sa.sa_mask);
-	sigCtrl.sa_flags = SA_RESTART;
+	sa.sa_flags = SA_RESTART;
 
 	if (sigaction(SIGINT, &sa, NULL)) {
 		perror("sigaction");
