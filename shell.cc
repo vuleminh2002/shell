@@ -17,7 +17,6 @@ extern "C" void ctrlC(int sig) {
 
 extern "C" void zombieHandler(int sig){
   int status;
-  pid_t pid;
   int pid = wait3(0, 0, NULL);
 
 	while (waitpid(-1, NULL, WNOHANG) > 0) {};
@@ -60,7 +59,7 @@ int main() {
 			exit(-1);
 		}
 
-    
+
   Shell::prompt();
   yyparse();
 }
