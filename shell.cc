@@ -6,7 +6,7 @@ int yyparse(void);
 
 extern "C" void ctrlC(int sig) {
 	//fflush(stdin);
-	printf("\n");
+	write(STDOUT_FILENO, "\n", 1);
 	Shell::prompt();
 }
 
@@ -21,11 +21,11 @@ int main() {
 
   //2.1 ctr+c handler
   struct sigaction sigCtrl;
-	sigCtrl.sa_handler = ctrlC;
-	sigemptyset(&sigCtrl.sa_mask);
+	sa.sa_handler = ctrlC;
+	sigemptyset(&sa.sa_mask);
 	sigCtrl.sa_flags = SA_RESTART;
 
-	if (sigaction(SIGINT, &sigCtrl, NULL)) {
+	if (sigaction(SIGINT, &sa, NULL)) {
 		perror("sigaction");
 		exit(2);
 	}
