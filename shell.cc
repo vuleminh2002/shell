@@ -6,7 +6,7 @@
 #include <sys/types.h>  // for pid_t (optional but good practice)
 #include <sys/wait.h>  
 #include "shell.hh"
-void yyrestart(FILE * file);
+//void yyrestart(FILE * file);
 int yyparse(void);
 
 

@@ -212,7 +212,7 @@ void Command::execute() {
         }
         if (lastPid == 0) {
             // CHILD PROCESS
-            signal(SIGINT, SIG_DFL); // handle ctr+c kill child process
+            //signal(SIGINT, SIG_DFL); // handle ctr+c kill child process
             // Convert arguments from std::vector<std::string*> to char* array
             SimpleCommand *scmd = _simpleCommands[i];
             size_t argCount = scmd->_arguments.size();
