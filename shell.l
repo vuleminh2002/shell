@@ -62,8 +62,12 @@ void myunputc(int c) {
 "2>" {
   return GREAT2;
 }
-
-
+//2.4 quote
+[\"([^\"\n]*)\"] {
+  //matching quote
+  yylval.cpp_string = new std::string(yytext + 1, yyleng - 2);
+  return WORD;
+}
 [^ \t\n|><][^ \t\n|><]*  {
   /* Assume that file names have only alpha chars */
   yylval.cpp_string = new std::string(yytext);

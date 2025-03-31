@@ -103,7 +103,9 @@ command_word:
   WORD {
   //2.3: Exit
 	if ( *$1 == "exit") {
-		printf("Good Bye!!\n");
+    #ifdef PRINTING
+		  printf("Good Bye!!\n");
+    #endif
 		exit(1);
 	}
     #ifdef PRINTING
