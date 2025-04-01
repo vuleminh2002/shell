@@ -69,18 +69,44 @@ void myunputc(int c) {
   return WORD;
 }
 
-[^ \t\n|><&]*\\[^ \t\n]*  {
-  /*2.5 Escape*/
-  std::string result;
-  for (int i = 0; i < yyleng; i++) {
-    if (yytext[i] == '\\' && i + 1 < yyleng && yytext[i + 1] != ' ' && yytext[i + 1] != '\t' && yytext[i + 1] != '\n') {
-      result += yytext[++i];  // unescape character
-    } else {
-      result += yytext[i];
-    }
-  }
-  yylval.cpp_string = new std::string(result);
-  return WORD;
+[^ \t\n|><&]*\\[^ \t\n]* {
+	/* 2.5 Escaping */
+
+	char * str = strdup(yytext);
+	char * newstr = (char*) malloc (100);
+	//printf("before deescaping, string = %s\n", str);
+
+	int i = 0;
+	while (*str){
+		if (*str == '\\'){
+			if (*(str+1) == '\\'){
+				str = str +2;
+				newstr[i++] = '\\';
+			}else{
+				newstr[i++] = *(++str);
+			}
+		}else{
+			newstr[i++] = *str;
+		}
+		str++;
+	}
+	newstr[i] = '\0';
+
+	//printf("after deescaping, string = %s\n", newstr);
+//	std::string *newstr;
+
+//	int i;
+//	for(i = 0; i <yytext->length(); i++){
+//		if (yytext[i] == '\\' && i < yytext->length()-1 && yytext[i+1] == '\\'){
+//			newstr->append('\\');
+//			i = i+1;
+//		}else{
+//			newstr->append(yytext[i]);
+//		}
+//	}
+	yylval.cpp_string = new std::string(newstr);
+
+	return WORD;
 }
 
 
