@@ -24,6 +24,13 @@
 #include "shell.hh"
 #include <sys/types.h>
 #include <cstring>
+#include <FlexLexer.h> 
+
+extern YY_BUFFER_STATE yy_create_buffer(FILE *, int);
+extern void yy_switch_to_buffer(YY_BUFFER_STATE);
+extern void yy_delete_buffer(YY_BUFFER_STATE);
+extern int yyparse();
+extern FILE *yyin;
 
 Command::Command() {
     // Initialize a new vector of Simple Commands
@@ -138,6 +145,30 @@ bool Command::builtIn(int i) {
 	}
 }
 
+void Command::handleSource(const std::string &filename) {
+    FILE *fp = fopen(filename.c_str(), "r");
+    if (!fp) {
+        perror(("source: " + filename).c_str());
+        return;
+    }
+
+    // Save current buffer
+    YY_BUFFER_STATE prevBuffer = YY_CURRENT_BUFFER;
+
+    // Create new buffer for file
+    YY_BUFFER_STATE newBuffer = yy_create_buffer(fp, YY_BUF_SIZE);
+    yy_switch_to_buffer(newBuffer);
+
+    // Parse the source file
+    yyparse();
+
+    // Restore previous buffer (stdin, usually)
+    yy_switch_to_buffer(prevBuffer);
+    yy_delete_buffer(newBuffer);
+
+    fclose(fp);
+}
+
 void Command::execute() {
     // Don't do anything if there are no simple commands
     if ( _simpleCommands.size() == 0 ) {
@@ -243,7 +274,15 @@ void Command::execute() {
         if(builtIn(i)){
             return;
         }
-
+        
+        if (_simpleCommands[i]->_arguments[0]->compare("source") == 0) {
+            std::string fileName = *(_simpleCommands[i]->_arguments[1]);
+            handleSource(fileName);
+            clear();
+            Shell::prompt();
+            return;
+        }
+        
         //Step 4: fork a child.
         lastPid = fork();
 

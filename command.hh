@@ -21,6 +21,7 @@ struct Command {
   void execute();
   bool builtIn2(int i);
   bool builtIn(int i);
+  void handleSource(const std::string &filename);
   static SimpleCommand *_currentSimpleCommand;
 };
 
