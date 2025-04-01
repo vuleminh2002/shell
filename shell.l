@@ -79,37 +79,38 @@ void myunputc(int c) {
 	return WORD;
 }
 
-[^ \t\n|><&]*\\.+ {
-	/* 2.5 Escaping */
-char *str = strdup(yytext);
-char *newstr = (char *)malloc(128);  // Adjust size as needed
-int i = 0;                           // Index for newstr
-int len = strlen(str);
+([^ \t\n|><&"]|\\.)+ {
+     int len = strlen(str);
+    std::string newstr;
+    newstr.reserve(len); // optional optimization
 
-for (int j = 0; j < len; j++) {
-    if (str[j] == '\\') {
-        // Check if the next character is also a backslash
-        if ((j + 1) < len && str[j + 1] == '\\') {
-            // Two backslashes => produce ONE literal '\'
-            newstr[i++] = '\\';
-            j++;  // Skip the next '\'
-        } else {
-            // Single backslash => skip it, take next char as literal
-            j++;
-            if (j < len) {
-                newstr[i++] = str[j];
+    for (int j = 0; j < len; j++) {
+        if (str[j] == '\\') {
+            // Check if the next character exists
+            if (j + 1 < len) {
+                // Case: two backslashes => produce one '\'
+                if (str[j + 1] == '\\') {
+                    newstr.push_back('\\');
+                    j++; // skip next '\'
+                } else {
+                    // Single backslash => skip it, add next char
+                    j++;
+                    if (j < len) {
+                        newstr.push_back(str[j]);
+                    }
+                }
+            } else {
+                // single '\' at end => literal
+                newstr.push_back('\\');
             }
+        } else {
+            // Normal character, copy as-is
+            newstr.push_back(str[j]);
         }
-    } else {
-        newstr[i++] = str[j];
     }
-}
 
-
-newstr[i] = '\0';
-
-
-free(str); // if you don't need 'str' anymore
+    yylval.cpp_string = new std::string(newstr);
+    return WORD;
 }
 
 
