@@ -884,41 +884,80 @@ YY_RULE_SETUP
 #line 72 "shell.l"
 {
   /*2.5 Escape*/
- std::string result;
-for (int i = 0; i < yyleng; ++i) {
-    if (yytext[i] == '\\') {
+  std::string result;
+    result.reserve(length);
+
+    for (int i = 0; i < length; /* increment inside loop */) {
+        // If current char is not a backslash, copy as-is
+        if (text[i] != '\\') {
+            result.push_back(text[i]);
+            i++;
+            continue;
+        }
+
+        // Otherwise, we have one or more backslashes in a row
         int count = 0;
         // Count consecutive backslashes
-        while (i < yyleng && yytext[i] == '\\') {
+        while (i < length && text[i] == '\\') {
             count++;
             i++;
         }
 
-        if (i < yyleng && yytext[i] != ' ' && yytext[i] != '\t' && yytext[i] != '\n') {
-            // Escaping the next character
-            result.append(count / 2, '\\');  // Every 2 slashes → one literal
-            if (count % 2 == 1) {
-                result += yytext[i];         // Odd one left → escape next char
-                continue; // Already moved `i` forward above
-            } else {
-                i--; // step back so outer loop catches this non-escaped char
+        // If we reached the end of string => put all backslashes literal
+        if (i == length) {
+            // Just put them all as literal
+            // each pair => one '\', leftover => literal single '\'
+            int pairs = count / 2;
+            int leftover = count % 2;
+            // pairs => produce that many '\'
+            for (int p = 0; p < pairs; p++) {
+                result.push_back('\\');
             }
-        } else {
-            // Backslashes before space/tab/newline → treat as literal
-            result.append(count, '\\');
-            i--; // so outer loop sees the next char (space, etc.)
+            // leftover => produce 1 '\'
+            if (leftover == 1) {
+                result.push_back('\\');
+            }
+            break; // done
         }
-    } else {
-        result += yytext[i];
+
+        // If next char is whitespace => treat all backslashes as literal
+        if (isspace((unsigned char)text[i])) {
+            // Put 'count' many literal backslashes
+            for (int c = 0; c < count; c++) {
+                result.push_back('\\');
+            }
+            // We haven't consumed text[i], so we keep going
+            // i not incremented => the loop will handle that character next time
+            continue;
+        }
+
+        // Next char is non-whitespace => maybe we do an "escape"
+        // Example:  \&
+        // We'll produce (count/2) literal backslashes, 
+        // if leftover=1 => that leftover means we "escape" the next char
+        int pairs = count / 2;
+        int leftover = count % 2;
+
+        // produce pairs many literal backslashes
+        for (int p = 0; p < pairs; p++) {
+            result.push_back('\\');
+        }
+
+        if (leftover == 1) {
+            // leftover means we consume the next char as escaped
+            // i is at next char
+            result.push_back(text[i]);
+            i++;  // skip next char
+        } 
+        // if leftover == 0 => do not skip next char, so outer loop sees it
     }
-}
-yylval.cpp_string = new std::string(result);
-return WORD;
+
+    return result;
 }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 107 "shell.l"
+#line 146 "shell.l"
 {
   /* Assume that file names have only alpha chars */
   yylval.cpp_string = new std::string(yytext);
@@ -927,17 +966,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 113 "shell.l"
+#line 152 "shell.l"
 {
     return NOTOKEN;
 }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 117 "shell.l"
+#line 156 "shell.l"
 ECHO;
 	YY_BREAK
-#line 941 "lex.yy.cc"
+#line 980 "lex.yy.cc"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1954,4 +1993,4 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 117 "shell.l"
+#line 156 "shell.l"
