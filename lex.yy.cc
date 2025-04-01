@@ -1025,13 +1025,14 @@ YY_RULE_SETUP
         // Create a new buffer for the source file
         YY_BUFFER_STATE newBuffer = yy_create_buffer(fp, YY_BUF_SIZE);
         yy_switch_to_buffer(newBuffer);
-
+        Shell::_isSubshell = true;
         // Parse the file
         yyparse();
 
         // After parsing, return to old buffer
         yy_switch_to_buffer(bufferStack.top());
         bufferStack.pop();
+        Shell::_isSubshell = false;
         fclose(fp);
     }
 
@@ -1040,7 +1041,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 110 "shell.l"
+#line 111 "shell.l"
 {
   /*matching quote*/
   yylval.cpp_string = new std::string(yytext + 1, yyleng - 2);
@@ -1049,7 +1050,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 116 "shell.l"
+#line 117 "shell.l"
 {
 	/* 2.4: Quotes */
 	
@@ -1062,7 +1063,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 126 "shell.l"
+#line 127 "shell.l"
 {
     /*2.5 escaping */
 
@@ -1107,7 +1108,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 168 "shell.l"
+#line 169 "shell.l"
 {
   /* 2.8 subshell */
   // Strip the outer $(...) or backticks
@@ -1137,7 +1138,6 @@ YY_RULE_SETUP
   close(pipeIn[1]);
 
   Shell::_isSubshell = true;
-
   int pid = fork();
   if (pid == 0) {
     //child process

@@ -165,7 +165,7 @@ source[ \t]+[^ \t\n]+ {
 
     return WORD;
 }
-
+/*
 \`[^\n\`]*\`|$\([^\n]*\) {
   /* 2.8 subshell */
   // Strip the outer $(...) or backticks
@@ -233,7 +233,7 @@ source[ \t]+[^ \t\n]+ {
     }
   }
 }
-
+*/
 [^ \t\n|><][^ \t\n|><]*  {
   /* Assume that file names have only alpha chars */
   yylval.cpp_string = new std::string(yytext);
