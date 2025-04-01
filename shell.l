@@ -68,6 +68,22 @@ void myunputc(int c) {
   yylval.cpp_string = new std::string(yytext + 1, yyleng - 2);
   return WORD;
 }
+
+([^ \t\n|><&\\]|\\[^ \t\n])+ {
+  /*2.5 Escape*/
+  std::string result;
+  for (int i = 0; i < yyleng; i++) {
+    if (yytext[i] == '\\' && i + 1 < yyleng && yytext[i + 1] != ' ' && yytext[i + 1] != '\t' && yytext[i + 1] != '\n') {
+      result += yytext[++i];  // unescape character
+    } else {
+      result += yytext[i];
+    }
+  }
+  yylval.cpp_string = new std::string(result);
+  return WORD;
+}
+
+
 [^ \t\n|><][^ \t\n|><]*  {
   /* Assume that file names have only alpha chars */
   yylval.cpp_string = new std::string(yytext);
