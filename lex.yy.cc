@@ -1063,7 +1063,7 @@ YY_RULE_SETUP
     // Read from pout[0]
     char buffer[4096] = {0};
     int n = read(pipeOut[0], buffer, sizeof(buffer));
-    printf("%c", buffer);
+    printf("%c", *buffer);
     close(pipeOut[0]);
 
     // Push the output back into the lexer input buffer
