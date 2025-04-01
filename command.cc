@@ -100,13 +100,36 @@ void Command::print() {
     printf( "\n\n" );
 }
 
+bool Command::builtIn(int i) {
+    // If the first argument is "printenv"
+
+    if (strcmp(_simpleCommands[i]->_arguments[0]->c_str(), "printenv") == 0) {
+
+
+        for (char **env = environ; *env; env++) {
+            printf("%s\n", *env);
+        }
+        clear();
+        Shell::prompt();
+        return true;  // means "handled"
+    }
+
+    // check other built-ins: cd, setenv, etc.
+
+    return false; // not handled
+}
+
 void Command::execute() {
     // Don't do anything if there are no simple commands
     if ( _simpleCommands.size() == 0 ) {
         Shell::prompt();
         return;
     }
-
+    
+    if (builtIn(0)) {
+        // builtIn handled it in the parent; no need to fork
+        return;
+    }
     // Print contents of Command data structure
     #ifdef PRINTING
         print();
