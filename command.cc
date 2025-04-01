@@ -25,10 +25,11 @@
 #include <sys/types.h>
 #include <cstring>
 #include <FlexLexer.h> 
-#include "y.tab.hh"     // Parser header
 
 
 extern "C" {
+    #include "y.tab.hh"     // Parser header
+
     #include <stdio.h>     // FILE*
     #include <stdlib.h>    // For malloc, free
     #include <string.h>    // For strcmp
