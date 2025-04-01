@@ -31,11 +31,7 @@
 
 extern FILE *yyin;
 extern int yyparse();
-extern YY_BUFFER_STATE yy_create_buffer(FILE *file, int size);
-extern void yy_switch_to_buffer(YY_BUFFER_STATE new_buffer);
-extern void yy_delete_buffer(YY_BUFFER_STATE buffer);
-extern YY_BUFFER_STATE yy_scan_string(const char *str);
-extern YY_BUFFER_STATE YY_CURRENT_BUFFER;
+
 // These are the correct declarations for buffer handling in Flex
 extern "C" {
     
