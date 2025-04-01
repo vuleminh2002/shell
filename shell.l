@@ -69,7 +69,7 @@ void myunputc(int c) {
   return WORD;
 }
 
-([^ \t\n|><&\\"]*\\[^ \t\n])+ {
+[^ \t\n|><&]*\\[^ \t\n]*  {
   /*2.5 Escape*/
   std::string result;
   for (int i = 0; i < yyleng; i++) {
