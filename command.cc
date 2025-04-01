@@ -119,6 +119,25 @@ bool Command::builtIn2(int i) {
     return false; // not handled
 }
 
+bool Command::BuiltIn(int i) {
+    if(strcmp(_simpleCommands[i]->_arguments[0]->c_str, "setenv") == 0) {
+        if(setenv(_simpleCommands[i]->_arguments[1], _simpleCommands[i]->_arguments[2], 1) != 0){
+            perror("setenv");
+        }
+        clear();
+        Shell:prompt();
+        return true;
+    }
+    if( strcmp(_simpleCommands[i]->_arguments[0]->c_str(), "unsetenv") == 0 ) {
+		if (unsetenv(_simpleCommands[i]->_arguments[1]->c_str()) != 0) {
+			perror("unsetenv");
+		}
+		clear();
+		Shell::prompt();
+		return true;
+	}
+}
+
 void Command::execute() {
     // Don't do anything if there are no simple commands
     if ( _simpleCommands.size() == 0 ) {
@@ -221,6 +240,9 @@ void Command::execute() {
         dup2(fdout, 1);
         close(fdout); 
       
+        if(BuiltIn(i)){
+            return;
+        }
 
         //Step 4: fork a child.
         lastPid = fork();
