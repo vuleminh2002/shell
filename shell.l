@@ -78,7 +78,7 @@ void myunputc(int c) {
   return GREAT2;
 }
 
-\`[^\n\`]*\`|\$\([^\n]*\) {
+\`[^\n\`]*\`|$\([^\n]*\) {
   /* 2.8 subshell */
   // Strip the outer $(...) or backticks
   std::string str(yytext);
