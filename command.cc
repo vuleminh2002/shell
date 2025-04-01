@@ -105,6 +105,7 @@ void Command::print() {
 
 bool Command::builtIn2(int i) {
     // If the first argument is "printenv"
+    bool Shell::_isSubshell = false;
 
     if (strcmp(_simpleCommands[i]->_arguments[0]->c_str(), "printenv") == 0)  {
 
@@ -123,6 +124,7 @@ bool Command::builtIn2(int i) {
 }
 
 bool Command::builtIn(int i) {
+    bool Shell::_isSubshell = false;
     if(strcmp(_simpleCommands[i]->_arguments[0]->c_str(), "setenv") == 0) {
         if(setenv(_simpleCommands[i]->_arguments[1]->c_str(), _simpleCommands[i]->_arguments[2]->c_str(), 1) != 0){
             perror("setenv");

@@ -13,11 +13,11 @@
 #include <vector>
 #include <stack>
 #include "y.tab.hh"
-#include <unistd.h>       // for fork, execvp, pipe, dup2, etc.
+#include <unistd.h>      
 #include <sys/types.h>
 #include <sys/wait.h> 
 extern int yyparse();
-#include "shell.hh"  // ✅ Include this to use Shell class
+#include "shell.hh"  
 extern FILE *yyin;
 
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
