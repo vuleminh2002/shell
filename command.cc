@@ -28,7 +28,7 @@
 #include "command.hh"
 #include "shell.hh"
 #include "y.tab.hh"         // Parser interface
-#include "lex.yy.cc"
+
 extern FILE *yyin;
 extern int yyparse();
 
