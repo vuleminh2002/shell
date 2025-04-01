@@ -25,7 +25,7 @@
 #include <sys/types.h>
 #include <cstring>
 #include <FlexLexer.h> 
-#include "y.tab.h"     // Parser header
+#include "y.tab.hh"     // Parser header
 
 
 extern "C" {
