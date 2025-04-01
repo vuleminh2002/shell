@@ -28,12 +28,12 @@ extern "C" void zombieHandler(int sig){
 bool Shell::_isSubshell = false;
 
 void Shell::prompt() {
-	if (isatty(0)) {
+	if (true) {
 	#ifdef PRINTING
 		printf("myshell>");
 	#endif
 		fflush(stdout);
-}
+	}
 }
 
 int main() {
