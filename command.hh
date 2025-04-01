@@ -19,7 +19,7 @@ struct Command {
   void clear();
   void print();
   void execute();
-  bool builtIn();
+  bool builtIn(int i);
   static SimpleCommand *_currentSimpleCommand;
 };
 
