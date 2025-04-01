@@ -305,35 +305,33 @@ void Command::execute() {
                 _exit(0); // Built-in executed; exit the child
             }
 
-        // Handle "source" command using Flex input buffer switching
-        if (_simpleCommands[i]->_arguments.size() > 1 &&
-            _simpleCommands[i]->_arguments[0]->compare("source") == 0) {
+            if (_simpleCommands[i]->_arguments[0]->compare("source") == 0 &&
+            _simpleCommands[i]->_arguments.size() > 1) {
             
-            const std::string &filename = *_simpleCommands[i]->_arguments[1];
-            FILE *fp = fopen(filename.c_str(), "r");
-
-            if (!fp) {
-                perror("source: fopen");
-                exit(1);
+                const std::string &filename = *_simpleCommands[i]->_arguments[1];
+                FILE *fp = fopen(filename.c_str(), "r");
+                if (!fp) {
+                    perror("source: fopen");
+                    exit(1);
+                }
+            
+                // Save current buffer
+                YY_BUFFER_STATE oldBuffer = YY_CURRENT_BUFFER;
+            
+                // Switch to source file input
+                YY_BUFFER_STATE fileBuffer = yy_create_buffer(fp, 8192);
+                yy_switch_to_buffer(fileBuffer);
+            
+                yyparse(); // Run parser on file
+            
+                // Restore buffer
+                yy_switch_to_buffer(oldBuffer);
+                yy_delete_buffer(fileBuffer);
+                fclose(fp);
+            
+                exit(0);  // Prevent further execvp
             }
-
-            // Save current input buffer
-            YY_BUFFER_STATE oldBuffer = YY_CURRENT_BUFFER;
-
-            // Create and switch to new buffer from the file
-            YY_BUFFER_STATE fileBuffer = yy_create_buffer(fp, YY_BUF_SIZE);
-            yy_switch_to_buffer(fileBuffer);
-
-            // Parse the file line-by-line as if it was typed
-            yyparse();
-
-            // Restore old buffer and clean up
-            yy_switch_to_buffer(oldBuffer);
-            yy_delete_buffer(fileBuffer);
-            fclose(fp);
-
-            exit(0); // Prevent executing further execvp
-        }
+        
                         
             
             SimpleCommand *scmd = _simpleCommands[i];
