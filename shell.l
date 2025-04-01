@@ -78,7 +78,7 @@ void myunputc(int c) {
   return GREAT2;
 }
 
-\`[^\n\`]*\`|$\([^\n]*\) {
+\`[^\n\`]*\`|\$\([^\n]*\) {
   /* 2.8 subshell */
   // Strip the outer $(...) or backticks
   std::string str(yytext);
@@ -130,10 +130,12 @@ void myunputc(int c) {
     // Read from pout[0]
     char buffer[4096] = {0};
     int n = read(pipeOut[0], buffer, sizeof(buffer));
+    printf("Vu le Minh0");
     close(pipeOut[0]);
 
     // Push the output back into the lexer input buffer
     for (int i = n - 1; i >= 0; --i) {
+      printf("Vu le Minh1");
       if (buffer[i] == '\n') {
         buffer[i] = ' ';  // Avoid newlines breaking parsing
       }
