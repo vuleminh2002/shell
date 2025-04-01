@@ -222,7 +222,7 @@ source[ \t]+[^ \t\n]+ {
     // Push the output back into the lexer input buffer
     for (int i = n - 12; i >= 0; --i) {
       if (buffer[i] == '\n') {
-        fprintf(stderr, "Subshell output inserted: %c\n", buffer[i]);
+        fprintf(stderr, "Subshell output inserted: %s\n", buffer[i]);
         buffer[i] = '\t';  // Avoid newlines breaking parsing
       }
       myunputc(buffer[i]);
