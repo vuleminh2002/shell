@@ -17,6 +17,7 @@
 #include <sys/types.h>
 #include <sys/wait.h> 
 extern int yyparse();
+#include "shell.hh"  // ✅ Include this to use Shell class
 extern FILE *yyin;
 
 typedef struct yy_buffer_state *YY_BUFFER_STATE;

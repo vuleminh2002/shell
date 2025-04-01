@@ -1135,6 +1135,8 @@ YY_RULE_SETUP
   write(pipeIn[1], str.c_str(), str.length());
   close(pipeIn[1]);
 
+  Shell::_isSubshell = true;
+
   int pid = fork();
   if (pid == 0) {
     //child process
@@ -1147,6 +1149,7 @@ YY_RULE_SETUP
     perror("execvup (subshell)");
     exit(1);
   } else {
+    Shell::_isSubshell = false;
     //parent process read the output
     waitpid(pid, nullptr, 0);
 
@@ -1159,13 +1162,13 @@ YY_RULE_SETUP
     // Read from pout[0]
     char buffer[4096] = {0};
     int n = read(pipeOut[0], buffer, sizeof(buffer));
-    fprintf(stderr, "Subshell output inserted: [%s]\n", buffer);
+    //fprintf(stderr, "Subshell output inserted: [%s]\n", buffer);
     close(pipeOut[0]);
 
     // Push the output back into the lexer input buffer
-    for (int i = n - 12; i >= 0; --i) {
+    for (int i = n - 1; i >= 0; --i) {
       if (buffer[i] == '\n') {
-        fprintf(stderr, "Subshell output inserted: %c\n", buffer[i]);
+        //fprintf(stderr, "Subshell output inserted: %c\n", buffer[i]);
         buffer[i] = '\t';  // Avoid newlines breaking parsing
       }
       myunputc(buffer[i]);
@@ -1175,7 +1178,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 233 "shell.l"
+#line 236 "shell.l"
 {
   /* Assume that file names have only alpha chars */
   yylval.cpp_string = new std::string(yytext);
@@ -1184,17 +1187,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 239 "shell.l"
+#line 242 "shell.l"
 {
     return NOTOKEN;
 }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 245 "shell.l"
+#line 248 "shell.l"
 ECHO;
 	YY_BREAK
-#line 1198 "lex.yy.cc"
+#line 1201 "lex.yy.cc"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2211,4 +2214,4 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 245 "shell.l"
+#line 248 "shell.l"
