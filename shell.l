@@ -76,7 +76,7 @@ void myunputc(int c) {
 }
 
 \`[^\n\`]*\`|\$\([^\n]*\) {
-  \* 2.8 subshell *\
+  /* 2.8 subshell */
   // Strip the outer $(...) or backticks
   std::string str(yytext);
   if (str[0] == '$') {
