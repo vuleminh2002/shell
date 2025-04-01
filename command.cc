@@ -139,6 +139,27 @@ bool Command::builtIn(int i) {
 		Shell::prompt();
 		return true;
 	}
+
+    if (strcmp(_simpleCommands[i]->_arguments[0]->c_str(), "cd") == 0) {
+
+		int error;
+		if (_simpleCommands[i]->_arguments.size() == 1) {	//if only "cd", then go HOME
+			error = chdir(getenv("HOME"));
+		}
+		else {
+			error = chdir(_simpleCommands[i]->_arguments[1]->c_str());
+		}
+
+		if (error < 0) {	//if error
+			perror("cd");
+		}
+
+		clear();
+		Shell::prompt();
+		return true;
+	}
+
+    return false;
 }
 
 
