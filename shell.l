@@ -192,6 +192,8 @@ source[ \t]+[^ \t\n]+ {
   write(pipeIn[1], str.c_str(), str.length());
   close(pipeIn[1]);
 
+  Shell::_isSubshell = true;
+
   int pid = fork();
   if (pid == 0) {
     //child process
@@ -204,6 +206,7 @@ source[ \t]+[^ \t\n]+ {
     perror("execvup (subshell)");
     exit(1);
   } else {
+    Shell::_isSubshell = false;
     //parent process read the output
     waitpid(pid, nullptr, 0);
 
@@ -216,13 +219,13 @@ source[ \t]+[^ \t\n]+ {
     // Read from pout[0]
     char buffer[4096] = {0};
     int n = read(pipeOut[0], buffer, sizeof(buffer));
-    fprintf(stderr, "Subshell output inserted: [%s]\n", buffer);
+    //fprintf(stderr, "Subshell output inserted: [%s]\n", buffer);
     close(pipeOut[0]);
 
     // Push the output back into the lexer input buffer
-    for (int i = n - 12; i >= 0; --i) {
+    for (int i = n - 1; i >= 0; --i) {
       if (buffer[i] == '\n') {
-        fprintf(stderr, "Subshell output inserted: %c\n", buffer[i]);
+        //fprintf(stderr, "Subshell output inserted: %c\n", buffer[i]);
         buffer[i] = '\t';  // Avoid newlines breaking parsing
       }
       myunputc(buffer[i]);

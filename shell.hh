@@ -6,6 +6,7 @@
 struct Shell {
 
   static void prompt();
+  static bool _isSubshell;
 
   static Command _currentCommand;
 };
