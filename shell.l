@@ -130,7 +130,7 @@ void myunputc(int c) {
     // Read from pout[0]
     char buffer[4096] = {0};
     int n = read(pipeOut[0], buffer, sizeof(buffer));
-    printf("Vu le Minh0");
+    printf("%c", buffer);
     close(pipeOut[0]);
 
     // Push the output back into the lexer input buffer
