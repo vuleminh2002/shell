@@ -24,7 +24,9 @@
 #include "shell.hh"
 #include <sys/types.h>
 #include <cstring>
+#include <FlexLexer.h> 
 #include "lex.yy.c"   // Only if you're *not* using %option c++
+
 
 extern "C" {
     #include "y.tab.h"     // Parser header
