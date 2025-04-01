@@ -149,7 +149,7 @@ bool Command::builtIn(int i) {
 		return true;
 	}
 }
-
+/*
 void Command::handleSource(const std::string &filename) {
     FILE *fp = fopen(filename.c_str(), "r");
     if (!fp) {
@@ -167,6 +167,7 @@ void Command::handleSource(const std::string &filename) {
     yy_delete_buffer(src);
     fclose(fp);
 }
+    */
 
 void Command::execute() {
     // Don't do anything if there are no simple commands
