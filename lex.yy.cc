@@ -1063,10 +1063,12 @@ YY_RULE_SETUP
     // Read from pout[0]
     char buffer[4096] = {0};
     int n = read(pipeOut[0], buffer, sizeof(buffer));
+    printf("Vu le Minh0");
     close(pipeOut[0]);
 
     // Push the output back into the lexer input buffer
     for (int i = n - 1; i >= 0; --i) {
+      printf("Vu le Minh1");
       if (buffer[i] == '\n') {
         buffer[i] = ' ';  // Avoid newlines breaking parsing
       }
@@ -1079,7 +1081,7 @@ return NOTOKEN;
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 147 "shell.l"
+#line 149 "shell.l"
 {
     std::string filename(yytext + 7); // Skip "source "
     FILE *fp = fopen(filename.c_str(), "r");
@@ -1108,7 +1110,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 173 "shell.l"
+#line 175 "shell.l"
 {
   /*matching quote*/
   yylval.cpp_string = new std::string(yytext + 1, yyleng - 2);
@@ -1117,7 +1119,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 179 "shell.l"
+#line 181 "shell.l"
 {
 	/* 2.4: Quotes */
 	
@@ -1130,7 +1132,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 189 "shell.l"
+#line 191 "shell.l"
 {
     /*2.5 escaping */
 
@@ -1175,7 +1177,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 232 "shell.l"
+#line 234 "shell.l"
 {
   /* Assume that file names have only alpha chars */
   yylval.cpp_string = new std::string(yytext);
@@ -1184,17 +1186,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 238 "shell.l"
+#line 240 "shell.l"
 {
     return NOTOKEN;
 }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 244 "shell.l"
+#line 246 "shell.l"
 ECHO;
 	YY_BREAK
-#line 1198 "lex.yy.cc"
+#line 1200 "lex.yy.cc"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2211,4 +2213,4 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 244 "shell.l"
+#line 246 "shell.l"

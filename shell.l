@@ -135,8 +135,9 @@ void myunputc(int c) {
 
     // Push the output back into the lexer input buffer
     for (int i = n - 1; i >= 0; --i) {
-      printf("Vu le Minh1");
+      
       if (buffer[i] == '\n') {
+        printf("Vu le Minh1\n");
         buffer[i] = ' ';  // Avoid newlines breaking parsing
       }
       myunputc(buffer[i]);
