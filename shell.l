@@ -69,16 +69,20 @@ void myunputc(int c) {
   return WORD;
 }
 
-[^ \t\n|><&]*\\[^ \t\n]*  {
-  /*2.5 Escape*/
+([^ \t\n|><&\\"]*\\[^ \t\n])+
+{
   std::string result;
-  for (int i = 0; i < yyleng; i++) {
-    if (yytext[i] == '\\' && i + 1 < yyleng && yytext[i + 1] != ' ' && yytext[i + 1] != '\t' && yytext[i + 1] != '\n') {
-      result += yytext[++i];  // unescape character
+  for (int i = 0; i < yyleng; ++i) {
+    if (yytext[i] == '\\' && i + 1 < yyleng &&
+        yytext[i + 1] != ' ' && yytext[i + 1] != '\t' && yytext[i + 1] != '\n') {
+      result += yytext[++i];  // skip backslash, add next char
     } else {
-      result += yytext[i];
+      result += yytext[i];    // regular character
     }
   }
+  yylval.cpp_string = new std::string(result);
+  return WORD;
+}
   yylval.cpp_string = new std::string(result);
   return WORD;
 }
