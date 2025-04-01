@@ -100,8 +100,8 @@ void myunputc(int c) {
   close(pipeIn[0]);
   close(pipeOut[1]);
 
-  write(pin[1], str.c_str(), str.length());
-  close(pin[1]);
+  write(pipeIn[1], str.c_str(), str.length());
+  close(pipeIn[1]);
 
   int pid = fork();
   if (pid == 0) {
@@ -116,17 +116,17 @@ void myunputc(int c) {
     exit(1);
   } else {
     //parent process read the output
-    waitid(pid, nullptr, 0);
+    waitpid(pid, nullptr, 0);
 
      // Restore original stdin/stdout
-    dup2(tmpin, 0);
-    dup2(tmpout, 1);
-    close(tmpin);
-    close(tmpout);
+    dup2(tempin, 0);
+    dup2(tempout, 1);
+    close(tempin);
+    close(tempout);
 
     // Read from pout[0]
     char buffer[4096] = {0};
-    int n = read(pout[0], buffer, sizeof(buffer));
+    int n = read(pipeOut[0], buffer, sizeof(buffer));
     close(pout[0]);
 
     // Push the output back into the lexer input buffer

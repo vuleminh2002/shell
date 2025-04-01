@@ -1038,7 +1038,7 @@ YY_RULE_SETUP
 
   int pid = fork();
   if (pid == 0) {
-    \\child process
+    //child process
     char *args[] = { (char*)"/proc/self/exe", nullptr };
     execvp(args[0], args);
     perror("execvp (subshell)");
