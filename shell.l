@@ -79,8 +79,8 @@ void myunputc(int c) {
 	return WORD;
 }
 
-[[^ \t\n|><&]*\\[^ \t\n]* {
-    // We'll copy yytext and unescape it into newstr.
+[^ \t\n|><&]*\\[^ \t\n]* {
+    /*2.5 escaping */
 
     char *src = strdup(yytext);
     int length = strlen(src);
