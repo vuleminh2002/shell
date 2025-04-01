@@ -28,7 +28,7 @@ extern "C" void zombieHandler(int sig){
 bool Shell::_isSubshell = false;
 
 void Shell::prompt() {
-	if (!Shell::_isSubshell && isatty(0)) {
+	if (isatty(0)) {
 	#ifdef PRINTING
 		printf("myshell>");
 	#endif
