@@ -79,37 +79,45 @@ void myunputc(int c) {
 	return WORD;
 }
 
-([^ \t\n|><&"]|\\.)+ {
-     int len = strlen(str);
-    std::string newstr;
-    newstr.reserve(len); // optional optimization
+[[^ \t\n|><&]*\\[^ \t\n]* {
+    // We'll copy yytext and unescape it into newstr.
 
-    for (int j = 0; j < len; j++) {
-        if (str[j] == '\\') {
-            // Check if the next character exists
-            if (j + 1 < len) {
-                // Case: two backslashes => produce one '\'
-                if (str[j + 1] == '\\') {
-                    newstr.push_back('\\');
-                    j++; // skip next '\'
-                } else {
-                    // Single backslash => skip it, add next char
-                    j++;
-                    if (j < len) {
-                        newstr.push_back(str[j]);
-                    }
-                }
+    char *src = strdup(yytext);
+    int length = strlen(src);
+
+    char *dest = (char *)malloc(length + 1);  // Enough space for worst case
+    int idx = 0;
+
+    // Iterate over each char in src
+    for (int j = 0; j < length; j++) {
+        if (src[j] == '\\') {
+            // Check if next char is also a backslash
+            if ((j + 1) < length && src[j + 1] == '\\') {
+                // Two backslashes => produce one '\'
+                dest[idx++] = '\\';
+                j++;   // Skip the next '\'
             } else {
-                // single '\' at end => literal
-                newstr.push_back('\\');
+                // Single backslash => skip it, output the next char
+                j++;
+                if (j < length) {
+                    dest[idx++] = src[j];
+                }
             }
         } else {
-            // Normal character, copy as-is
-            newstr.push_back(str[j]);
+            // Normal character
+            dest[idx++] = src[j];
         }
     }
 
-    yylval.cpp_string = new std::string(newstr);
+    // Null-terminate
+    dest[idx] = '\0';
+
+    // Assign to yylval and return
+    yylval.cpp_string = new std::string(dest);
+
+    free(src);
+    free(dest);
+
     return WORD;
 }
 
