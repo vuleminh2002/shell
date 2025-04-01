@@ -145,24 +145,24 @@ bool Command::builtIn(int i) {
 
     if (strcmp(_simpleCommands[i]->_arguments[0]->c_str(), "cd") == 0) {
         int error;
-        if (_simpleCommands[i]->_arguments.size() == 1) {  // if only "cd", then go HOME
-            error = chdir(getenv("HOME"));
+        const char *target;
+    
+        if (_simpleCommands[i]->_arguments.size() == 1) {
+            target = getenv("HOME");
         } else {
-            error = chdir(_simpleCommands[i]->_arguments[1]->c_str());
+            target = _simpleCommands[i]->_arguments[1]->c_str();
         }
     
-        if (error < 0) {  // if error
-            if (_simpleCommands[i]->_arguments.size() == 1) {
-                fprintf(stderr, "cd: can't cd to %s\n", getenv("HOME"));
-            } else {
-                fprintf(stderr, "cd: can't cd to %s\n", _simpleCommands[i]->_arguments[1]->c_str());
-            }
+        error = chdir(target);
+    
+        if (error < 0) {
+            fprintf(stderr, "cd: can't cd to %s\n", target);
         }
     
         Shell::_isSubshell = false;
         clear();
         Shell::prompt();
-        return true;
+        return true;  // Make sure we **don't fall through** and execute anything else
     }
 
     return false;
