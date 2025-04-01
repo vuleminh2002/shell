@@ -23,7 +23,7 @@
 #include "command.hh"
 #include "shell.hh"
 #include <sys/types.h>
-
+#include <cstring>
 
 Command::Command() {
     // Initialize a new vector of Simple Commands
@@ -103,7 +103,7 @@ void Command::print() {
 bool Command::builtIn(int i) {
     // If the first argument is "printenv"
 
-    if (strcmp(_simpleCommands[i]->_arguments[0]->c_str(), "printenv") == 0) {
+    if (strcmp(_simpleCommands[i]->_arguments[0]->c_str(), "printenv") == 0)  {
 
 
         for (char **env = environ; *env; env++) {
