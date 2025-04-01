@@ -26,18 +26,15 @@
 #include <cstring>
 
 
-#include "y.tab.hh"     // Bison parser header (already generated)
-extern int yyparse();   // Ensure parser is visible
+#include "y.tab.hh"   // for yyparse()
+extern FILE *yyin;
 
-extern FILE *yyin;      // Input stream for lexer
-
-// Buffer state type from Flex
-typedef struct yy_buffer_state *YY_BUFFER_STATE;
-
-extern YY_BUFFER_STATE yy_create_buffer(FILE *file, int size);
-extern void yy_switch_to_buffer(YY_BUFFER_STATE new_buffer);
-extern void yy_delete_buffer(YY_BUFFER_STATE buffer);
-extern YY_BUFFER_STATE yy_scan_string(const char *str);
+extern YY_BUFFER_STATE yy_create_buffer(FILE *, int);
+extern void yy_switch_to_buffer(YY_BUFFER_STATE);
+extern void yy_delete_buffer(YY_BUFFER_STATE);
+extern YY_BUFFER_STATE yy_scan_string(const char *);
+extern YY_BUFFER_STATE yy_scan_bytes(const char *, int);
+extern YY_BUFFER_STATE YY_CURRENT_BUFFER;
 
 Command::Command() {
     // Initialize a new vector of Simple Commands
@@ -276,13 +273,13 @@ void Command::execute() {
             return;
         }
         
-        if (_simpleCommands[i]->_arguments[0]->compare("source") == 0) {
-            std::string fileName = *(_simpleCommands[i]->_arguments[1]);
-            handleSource(fileName);
-            clear();
-            Shell::prompt();
-            return;
-        }
+        //if (_simpleCommands[i]->_arguments[0]->compare("source") == 0) {
+        //    std::string fileName = *(_simpleCommands[i]->_arguments[1]);
+        //    handleSource(fileName);
+        //    clear();
+        //    Shell::prompt();
+        //    return;
+       // }
 
         //Step 4: fork a child.
         lastPid = fork();
@@ -300,6 +297,37 @@ void Command::execute() {
                 _exit(0); // Built-in executed; exit the child
             }
 
+        // Handle "source" command using Flex input buffer switching
+        if (_simpleCommands[i]->_arguments.size() > 1 &&
+            _simpleCommands[i]->_arguments[0]->compare("source") == 0) {
+            
+            const std::string &filename = *_simpleCommands[i]->_arguments[1];
+            FILE *fp = fopen(filename.c_str(), "r");
+
+            if (!fp) {
+                perror("source: fopen");
+                exit(1);
+            }
+
+            // Save current input buffer
+            YY_BUFFER_STATE oldBuffer = YY_CURRENT_BUFFER;
+
+            // Create and switch to new buffer from the file
+            YY_BUFFER_STATE fileBuffer = yy_create_buffer(fp, YY_BUF_SIZE);
+            yy_switch_to_buffer(fileBuffer);
+
+            // Parse the file line-by-line as if it was typed
+            yyparse();
+
+            // Restore old buffer and clean up
+            yy_switch_to_buffer(oldBuffer);
+            yy_delete_buffer(fileBuffer);
+            fclose(fp);
+
+            exit(0); // Prevent executing further execvp
+        }
+                        
+            
             SimpleCommand *scmd = _simpleCommands[i];
             size_t argCount = scmd->_arguments.size();
             char **argv = new char*[argCount + 1];
