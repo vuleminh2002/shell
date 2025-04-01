@@ -28,13 +28,13 @@
 #include "command.hh"
 #include "shell.hh"
 #include "y.tab.hh"         // Parser interface
-
+#include "lex.yy.cc"
 extern FILE *yyin;
 extern int yyparse();
 
 // These are the correct declarations for buffer handling in Flex
 extern "C" {
-    #include "lex.yy.c"
+    
     typedef struct yy_buffer_state *YY_BUFFER_STATE;
     YY_BUFFER_STATE yy_create_buffer(FILE *file, int size);
     void yy_switch_to_buffer(YY_BUFFER_STATE new_buffer);
