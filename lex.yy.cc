@@ -1009,7 +1009,7 @@ case 11:
 YY_RULE_SETUP
 #line 78 "shell.l"
 {
-  \* 2.8 subshell *\
+  /* 2.8 subshell */
   // Strip the outer $(...) or backticks
   std::string str(yytext);
   if (str[0] == '$') {
