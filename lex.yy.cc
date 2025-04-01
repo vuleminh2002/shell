@@ -372,8 +372,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 		YY_FATAL_ERROR( "token too large, exceeds YYLMAX" ); \
 	yy_flex_strncpy( yytext, (yytext_ptr), yyleng + 1 ); \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 15
-#define YY_END_OF_BUFFER 16
+#define YY_NUM_RULES 16
+#define YY_END_OF_BUFFER 17
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -381,12 +381,12 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[34] =
+static const flex_int16_t yy_accept[40] =
     {   0,
-        0,    0,   16,   13,    2,    1,   13,    4,   13,    5,
-        6,   13,    3,   13,   13,   13,   13,    0,   11,   10,
-        7,    8,   12,   12,   12,   12,   11,    9,    0,    0,
-       12,   12,    0
+        0,    0,   17,   14,    2,    1,   14,    4,   14,    5,
+        6,   13,    3,   14,   14,   13,   14,    0,   11,   14,
+       13,   10,    7,    8,   13,   13,   13,   13,   11,   11,
+       13,   11,   13,   13,   13,    9,   11,   11,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -423,55 +423,63 @@ static const YY_CHAR yy_ec[256] =
 
 static const YY_CHAR yy_meta[11] =
     {   0,
-        1,    2,    3,    4,    4,    1,    5,    5,    1,    5
+        1,    2,    3,    1,    1,    1,    4,    4,    1,    4
     } ;
 
-static const flex_int16_t yy_base[38] =
+static const flex_int16_t yy_base[45] =
     {   0,
-        0,    0,   32,   10,   76,   76,   19,    0,   23,   76,
-       25,   33,   76,    0,    0,    0,    0,   18,    0,   76,
-       76,   13,    0,    0,    8,    0,   76,   76,    4,   43,
-        0,   52,   76,   61,   65,   11,   70
+        0,    0,   28,    6,   97,   97,   15,    0,   21,   97,
+       26,   34,   97,   19,    0,    0,    0,   14,    0,   44,
+       53,   97,   97,    9,    0,   63,    0,    0,   97,    0,
+        0,    0,   72,   80,    0,   97,    0,    0,   97,   12,
+       11,   84,   88,   92
     } ;
 
-static const flex_int16_t yy_def[38] =
+static const flex_int16_t yy_def[45] =
     {   0,
-       33,    1,   33,   33,   33,   33,   33,   34,    4,   33,
-       33,   33,   33,    4,   34,   12,    7,   35,   34,   33,
-       33,   33,    4,    4,   36,   12,   33,   33,   36,   37,
-       29,   37,    0,   33,   33,   33,   33
+       39,    1,   39,   40,   39,   39,   39,   41,   40,   39,
+       39,   39,   39,    9,   41,   12,    7,   42,   14,    7,
+       39,   39,   39,   39,   12,   12,   43,   12,   39,   41,
+       21,   12,   21,   44,   21,   39,   26,   43,    0,   39,
+       39,   39,   39,   39
     } ;
 
-static const flex_int16_t yy_nxt[87] =
+static const flex_int16_t yy_nxt[108] =
     {   0,
         4,    5,    6,    7,    8,    9,   10,   11,   12,   13,
-       14,   29,   30,   15,   15,   14,   30,   28,   16,   17,
-       18,   27,   19,   17,   17,   18,   18,   17,   18,   21,
-       20,   33,   22,   23,   33,   33,   24,   24,   23,   25,
-       25,   26,   25,   31,   33,   33,   33,   33,   31,   33,
-       33,   32,   31,   33,   33,   33,   33,   31,   33,   33,
-       32,   15,   33,   33,   15,   18,   18,   33,   18,   18,
-       25,   33,   33,   25,   25,    3,   33,   33,   33,   33,
-       33,   33,   33,   33,   33,   33
+       15,   15,   14,   36,   16,   17,   18,   29,   19,   20,
+       17,   18,   18,   21,   18,   15,   39,   39,   22,   16,
+       23,   39,   39,   24,   25,   39,   39,   25,   26,   25,
+       27,   27,   28,   27,   20,   39,   39,   30,   39,   20,
+       39,   39,   20,   31,   18,   39,   32,   33,   31,   34,
+       34,   35,   34,   26,   39,   39,   26,   39,   26,   39,
+       39,   26,   33,   39,   39,   37,   39,   33,   39,   39,
+       33,   18,   39,   38,   18,   18,   39,   18,   27,   39,
+       39,   27,   34,   34,   39,   34,    3,   39,   39,   39,
+
+       39,   39,   39,   39,   39,   39,   39
     } ;
 
-static const flex_int16_t yy_chk[87] =
+static const flex_int16_t yy_chk[108] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        4,   36,   29,    4,    4,    4,   25,   22,    4,    7,
-        7,   18,    7,    7,    7,    7,    7,    7,    7,   11,
-        9,    3,   11,   12,    0,    0,   12,   12,   12,   12,
-       12,   12,   12,   30,    0,    0,    0,    0,   30,    0,
-        0,   30,   32,    0,    0,    0,    0,   32,    0,    0,
-       32,   34,    0,    0,   34,   35,   35,    0,   35,   35,
-       37,    0,    0,   37,   37,   33,   33,   33,   33,   33,
-       33,   33,   33,   33,   33,   33
+        4,   41,   40,   24,    4,    7,    7,   18,    7,    7,
+        7,    7,    7,    7,    7,    9,   14,    3,    9,    9,
+       11,    0,    0,   11,   12,    0,    0,   12,   12,   12,
+       12,   12,   12,   12,   20,    0,    0,   20,    0,   20,
+        0,    0,   20,   21,   21,    0,   21,   21,   21,   21,
+       21,   21,   21,   26,    0,    0,   26,    0,   26,    0,
+        0,   26,   33,    0,    0,   33,    0,   33,    0,    0,
+       33,   34,    0,   34,   42,   42,    0,   42,   43,    0,
+        0,   43,   44,   44,    0,   44,   39,   39,   39,   39,
+
+       39,   39,   39,   39,   39,   39,   39
     } ;
 
 /* Table of booleans, true if rule could match eol. */
-static const flex_int32_t yy_rule_can_match_eol[16] =
+static const flex_int32_t yy_rule_can_match_eol[17] =
     {   0,
-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     };
+1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,     };
 
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
@@ -511,8 +519,8 @@ void myunputc(int c) {
   unput(c);
 }
 
-#line 515 "lex.yy.cc"
-#line 516 "lex.yy.cc"
+#line 523 "lex.yy.cc"
+#line 524 "lex.yy.cc"
 
 #define INITIAL 0
 
@@ -732,7 +740,7 @@ YY_DECL
 #line 24 "shell.l"
 
 
-#line 736 "lex.yy.cc"
+#line 744 "lex.yy.cc"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -759,13 +767,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 34 )
+				if ( yy_current_state >= 40 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 76 );
+		while ( yy_base[yy_current_state] != 97 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -883,100 +891,67 @@ case 12:
 YY_RULE_SETUP
 #line 72 "shell.l"
 {
-  /*2.5 Escape*/
-  std::string result;
-    result.reserve(length);
+	/* 2.4: Quotes */
+	
+	yylval.cpp_string = new std::string(yytext);
+	*yylval.cpp_string = yylval.cpp_string->substr(1, yylval.cpp_string->length()-2);
 
-    for (int i = 0; i < length; /* increment inside loop */) {
-        // If current char is not a backslash, copy as-is
-        if (text[i] != '\\') {
-            result.push_back(text[i]);
-            i++;
-            continue;
-        }
-
-        // Otherwise, we have one or more backslashes in a row
-        int count = 0;
-        // Count consecutive backslashes
-        while (i < length && text[i] == '\\') {
-            count++;
-            i++;
-        }
-
-        // If we reached the end of string => put all backslashes literal
-        if (i == length) {
-            // Just put them all as literal
-            // each pair => one '\', leftover => literal single '\'
-            int pairs = count / 2;
-            int leftover = count % 2;
-            // pairs => produce that many '\'
-            for (int p = 0; p < pairs; p++) {
-                result.push_back('\\');
-            }
-            // leftover => produce 1 '\'
-            if (leftover == 1) {
-                result.push_back('\\');
-            }
-            break; // done
-        }
-
-        // If next char is whitespace => treat all backslashes as literal
-        if (isspace((unsigned char)text[i])) {
-            // Put 'count' many literal backslashes
-            for (int c = 0; c < count; c++) {
-                result.push_back('\\');
-            }
-            // We haven't consumed text[i], so we keep going
-            // i not incremented => the loop will handle that character next time
-            continue;
-        }
-
-        // Next char is non-whitespace => maybe we do an "escape"
-        // Example:  \&
-        // We'll produce (count/2) literal backslashes, 
-        // if leftover=1 => that leftover means we "escape" the next char
-        int pairs = count / 2;
-        int leftover = count % 2;
-
-        // produce pairs many literal backslashes
-        for (int p = 0; p < pairs; p++) {
-            result.push_back('\\');
-        }
-
-        if (leftover == 1) {
-            // leftover means we consume the next char as escaped
-            // i is at next char
-            result.push_back(text[i]);
-            i++;  // skip next char
-        } 
-        // if leftover == 0 => do not skip next char, so outer loop sees it
-    }
-
-    return result;
+	/*printf("after dequote, string = %s\n",yylval.cpp_string);*/
+	return WORD;
 }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 146 "shell.l"
+#line 82 "shell.l"
+{
+	/* 2.5 Escaping */
+
+	char * str = strdup(yytext);
+	char * newstr = (char*) malloc (100);
+	//printf("before deescaping, string = %s\n", str);
+
+	int i = 0;
+	while (*str){
+		if (*str == '\\'){
+			if (*(str+1) == '\\'){
+				str = str +2;
+				newstr[i++] = '\\';
+			}else{
+				newstr[i++] = *(++str);
+			}
+		}else{
+			newstr[i++] = *str;
+		}
+		str++;
+	}
+	newstr[i] = '\0';
+	yylval.cpp_string = new std::string(newstr);
+
+	return WORD;
+}
+	YY_BREAK
+case 14:
+YY_RULE_SETUP
+#line 110 "shell.l"
 {
   /* Assume that file names have only alpha chars */
   yylval.cpp_string = new std::string(yytext);
   return WORD;
 }
 	YY_BREAK
-case 14:
+case 15:
 YY_RULE_SETUP
-#line 152 "shell.l"
+#line 116 "shell.l"
 {
     return NOTOKEN;
 }
 	YY_BREAK
-case 15:
+case 16:
 YY_RULE_SETUP
-#line 156 "shell.l"
+#line 120 "shell.l"
 ECHO;
 	YY_BREAK
-#line 980 "lex.yy.cc"
+#line 955 "lex.yy.cc"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1273,7 +1248,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 34 )
+			if ( yy_current_state >= 40 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1301,11 +1276,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 34 )
+		if ( yy_current_state >= 40 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 33);
+	yy_is_jam = (yy_current_state == 39);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1993,4 +1968,4 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 156 "shell.l"
+#line 120 "shell.l"

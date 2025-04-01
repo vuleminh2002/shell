@@ -79,31 +79,37 @@ void myunputc(int c) {
 	return WORD;
 }
 
-[^ \t\n|><&]*\\[^ \t\n]* {
+[^ \t\n|><&]*\\.+ {
 	/* 2.5 Escaping */
+char *str = strdup(yytext);
+char *newstr = (char *)malloc(128);  // Adjust size as needed
+int i = 0;                           // Index for newstr
+int len = strlen(str);
 
-	char * str = strdup(yytext);
-	char * newstr = (char*) malloc (100);
-	//printf("before deescaping, string = %s\n", str);
+for (int j = 0; j < len; j++) {
+    if (str[j] == '\\') {
+        // Check if the next character is also a backslash
+        if ((j + 1) < len && str[j + 1] == '\\') {
+            // Two backslashes => produce ONE literal '\'
+            newstr[i++] = '\\';
+            j++;  // Skip the next '\'
+        } else {
+            // Single backslash => skip it, take next char as literal
+            j++;
+            if (j < len) {
+                newstr[i++] = str[j];
+            }
+        }
+    } else {
+        newstr[i++] = str[j];
+    }
+}
 
-	int i = 0;
-	while (*str){
-		if (*str == '\\'){
-			if (*(str+1) == '\\'){
-				str = str +2;
-				newstr[i++] = '\\';
-			}else{
-				newstr[i++] = *(++str);
-			}
-		}else{
-			newstr[i++] = *str;
-		}
-		str++;
-	}
-	newstr[i] = '\0';
-	yylval.cpp_string = new std::string(newstr);
 
-	return WORD;
+newstr[i] = '\0';
+
+
+free(str); // if you don't need 'str' anymore
 }
 
 
