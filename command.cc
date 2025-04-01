@@ -125,7 +125,7 @@ bool Command::builtIn(int i) {
             perror("setenv");
         }
         clear();
-        Shell:prompt();
+        Shell::prompt();
         return true;
     }
     if( strcmp(_simpleCommands[i]->_arguments[0]->c_str(), "unsetenv") == 0 ) {
