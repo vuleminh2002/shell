@@ -7,18 +7,21 @@
  */
 
 %{
-
+#include <cstdio>
 #include <cstring>
+#include <string>
+#include <vector>
+#include <stack>
 #include "y.tab.hh"
+extern int yyparse();
 extern FILE *yyin;
 
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
-YY_BUFFER_STATE yy_create_buffer(FILE *file, int size);
-void yy_switch_to_buffer(YY_BUFFER_STATE new_buffer);
-void yy_delete_buffer(YY_BUFFER_STATE buffer);
-YY_BUFFER_STATE yy_scan_string(const char *str);
-YY_BUFFER_STATE yy_scan_bytes(const char *bytes, int len);
-extern YY_BUFFER_STATE YY_CURRENT_BUFFER;
+extern YY_BUFFER_STATE yy_create_buffer(FILE *, int);
+extern void yy_switch_to_buffer(YY_BUFFER_STATE);
+extern void yy_delete_buffer(YY_BUFFER_STATE);
+
+std::stack<YY_BUFFER_STATE> bufferStack;
 
 static  void yyunput (int c,char *buf_ptr  );
 
@@ -73,28 +76,29 @@ void myunputc(int c) {
 }
 
 source[ \t]+[^ \t\n]+ {
-    // Extract filename
-    const char *filename = yytext + 6; // skip "source"
-    while (*filename == ' ' || *filename == '\t') {
-        filename++;
-    }
+    std::string filename(yytext + 7); // Skip "source "
+    FILE *fp = fopen(filename.c_str(), "r");
 
-    FILE *fp = fopen(filename, "r");
     if (!fp) {
-        fprintf(stderr, "source: cannot open file %s\n", filename);
-        return NEWLINE;
+        fprintf(stderr, "source: cannot open file %s\n", filename.c_str());
+    } else {
+        // Save current buffer
+        bufferStack.push(YY_CURRENT_BUFFER);
+
+        // Create a new buffer for the source file
+        YY_BUFFER_STATE newBuffer = yy_create_buffer(fp, YY_BUF_SIZE);
+        yy_switch_to_buffer(newBuffer);
+
+        // Parse the file
+        yyparse();
+
+        // After parsing, return to old buffer
+        yy_switch_to_buffer(bufferStack.top());
+        bufferStack.pop();
+        fclose(fp);
     }
 
-    // Save current buffer
-    bufferStackTop++;
-    bufferStack[bufferStackTop] = YY_CURRENT_BUFFER;
-
-    // Create new buffer for source file
-    YY_BUFFER_STATE newBuf = yy_create_buffer(fp, YY_BUF_SIZE);
-    yy_switch_to_buffer(newBuf);
-    yyin = fp;
-
-    return NEWLINE;  // So parser keeps going
+    return NEWLINE; // simulate a newline after running source
 }
 
 \"([^\"\n]*)\" {
