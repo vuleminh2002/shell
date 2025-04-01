@@ -105,10 +105,10 @@ void Command::print() {
 
 bool Command::builtIn2(int i) {
     // If the first argument is "printenv"
-    Shell::_isSubshell = false;
 
     if (strcmp(_simpleCommands[i]->_arguments[0]->c_str(), "printenv") == 0)  {
 
+        Shell::_isSubshell = false;
 
         for (char **env = environ; *env; env++) {
             printf("%s\n", *env);
@@ -124,11 +124,11 @@ bool Command::builtIn2(int i) {
 }
 
 bool Command::builtIn(int i) {
-    Shell::_isSubshell = false;
     if(strcmp(_simpleCommands[i]->_arguments[0]->c_str(), "setenv") == 0) {
         if(setenv(_simpleCommands[i]->_arguments[1]->c_str(), _simpleCommands[i]->_arguments[2]->c_str(), 1) != 0){
             perror("setenv");
         }
+        Shell::_isSubshell = false;
         clear();
         Shell::prompt();
         return true;
@@ -137,6 +137,7 @@ bool Command::builtIn(int i) {
 		if (unsetenv(_simpleCommands[i]->_arguments[1]->c_str()) != 0) {
 			perror("unsetenv");
 		}
+        Shell::_isSubshell = false;
 		clear();
 		Shell::prompt();
 		return true;
@@ -155,7 +156,7 @@ bool Command::builtIn(int i) {
 		if (error < 0) {	//if error
 			perror("cd");
 		}
-
+        Shell::_isSubshell = false;
 		clear();
 		Shell::prompt();
 		return true;
