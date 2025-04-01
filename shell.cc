@@ -26,7 +26,6 @@ extern "C" void zombieHandler(int sig){
 
 
 
-
 void Shell::prompt() {
 	if (isatty(0)) {
 	#ifdef PRINTING
