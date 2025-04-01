@@ -25,24 +25,16 @@
 #include <sys/types.h>
 #include <cstring>
 
-#include "command.hh"
-#include "shell.hh"
-#include "y.tab.hh"         // Parser interface
-
 extern FILE *yyin;
 extern int yyparse();
 
-// These are the correct declarations for buffer handling in Flex
 extern "C" {
-    
     typedef struct yy_buffer_state *YY_BUFFER_STATE;
     YY_BUFFER_STATE yy_create_buffer(FILE *file, int size);
     void yy_switch_to_buffer(YY_BUFFER_STATE new_buffer);
     void yy_delete_buffer(YY_BUFFER_STATE buffer);
-    YY_BUFFER_STATE yy_scan_string(const char *str);
-    YY_BUFFER_STATE yy_scan_bytes(const char *bytes, int len);
-    YY_BUFFER_STATE YY_CURRENT_BUFFER;
 }
+
 
 Command::Command() {
     // Initialize a new vector of Simple Commands
