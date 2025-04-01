@@ -1060,7 +1060,7 @@ YY_RULE_SETUP
     // Read from pout[0]
     char buffer[4096] = {0};
     int n = read(pipeOut[0], buffer, sizeof(buffer));
-    close(pout[0]);
+    close(pipeOut[0]);
 
     // Push the output back into the lexer input buffer
     for (int i = n - 1; i >= 0; --i) {

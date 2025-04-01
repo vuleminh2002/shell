@@ -13,6 +13,8 @@
 #include <vector>
 #include <stack>
 #include "y.tab.hh"
+#include <unistd.h>       // for fork, execvp, pipe, dup2, etc.
+#include <sys/types.h> 
 extern int yyparse();
 extern FILE *yyin;
 
