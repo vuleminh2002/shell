@@ -26,6 +26,13 @@
 #include <cstring>
 #include <FlexLexer.h> 
 
+extern "C" {
+    #include "y.tab.h"     // Parser header
+    #include <stdio.h>     // FILE*
+    #include <stdlib.h>    // For malloc, free
+    #include <string.h>    // For strcmp
+}
+
 extern YY_BUFFER_STATE yy_create_buffer(FILE *, int);
 extern void yy_switch_to_buffer(YY_BUFFER_STATE);
 extern void yy_delete_buffer(YY_BUFFER_STATE);
@@ -282,7 +289,7 @@ void Command::execute() {
             Shell::prompt();
             return;
         }
-        
+
         //Step 4: fork a child.
         lastPid = fork();
 
