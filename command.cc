@@ -24,22 +24,20 @@
 #include "shell.hh"
 #include <sys/types.h>
 #include <cstring>
-#include <FlexLexer.h> 
-#include "lex.yy.cc"  
 
-extern "C" {
-    #include "y.tab.hh"     // Parser header
 
-    #include <stdio.h>     // FILE*
-    #include <stdlib.h>    // For malloc, free
-    #include <string.h>    // For strcmp
-}
+#include "y.tab.hh"     // Bison parser header (already generated)
+extern int yyparse();   // Ensure parser is visible
 
-extern YY_BUFFER_STATE yy_create_buffer(FILE *, int);
-extern void yy_switch_to_buffer(YY_BUFFER_STATE);
-extern void yy_delete_buffer(YY_BUFFER_STATE);
-extern int yyparse();
-extern FILE *yyin;
+extern FILE *yyin;      // Input stream for lexer
+
+// Buffer state type from Flex
+typedef struct yy_buffer_state *YY_BUFFER_STATE;
+
+extern YY_BUFFER_STATE yy_create_buffer(FILE *file, int size);
+extern void yy_switch_to_buffer(YY_BUFFER_STATE new_buffer);
+extern void yy_delete_buffer(YY_BUFFER_STATE buffer);
+extern YY_BUFFER_STATE yy_scan_string(const char *str);
 
 Command::Command() {
     // Initialize a new vector of Simple Commands
@@ -157,24 +155,18 @@ bool Command::builtIn(int i) {
 void Command::handleSource(const std::string &filename) {
     FILE *fp = fopen(filename.c_str(), "r");
     if (!fp) {
-        perror(("source: " + filename).c_str());
+        perror(("source: cannot open " + filename).c_str());
         return;
     }
 
-    // Save current buffer
-    YY_BUFFER_STATE prevBuffer = YY_CURRENT_BUFFER;
+    YY_BUFFER_STATE prev = yy_create_buffer(yyin, 8192);
+    YY_BUFFER_STATE src = yy_create_buffer(fp, 8192);
 
-    // Create new buffer for file
-    YY_BUFFER_STATE newBuffer = yy_create_buffer(fp, YY_BUF_SIZE);
-    yy_switch_to_buffer(newBuffer);
+    yy_switch_to_buffer(src);
+    yyparse();  // This will read the file line-by-line as if typed by user
+    yy_switch_to_buffer(prev);
 
-    // Parse the source file
-    yyparse();
-
-    // Restore previous buffer (stdin, usually)
-    yy_switch_to_buffer(prevBuffer);
-    yy_delete_buffer(newBuffer);
-
+    yy_delete_buffer(src);
     fclose(fp);
 }
 
