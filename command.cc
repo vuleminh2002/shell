@@ -119,7 +119,7 @@ bool Command::builtIn2(int i) {
     return false; // not handled
 }
 
-bool Command::BuiltIn(int i) {
+bool Command::builtIn(int i) {
     if(strcmp(_simpleCommands[i]->_arguments[0]->c_str, "setenv") == 0) {
         if(setenv(_simpleCommands[i]->_arguments[1], _simpleCommands[i]->_arguments[2], 1) != 0){
             perror("setenv");
@@ -240,7 +240,7 @@ void Command::execute() {
         dup2(fdout, 1);
         close(fdout); 
       
-        if(BuiltIn(i)){
+        if(builtIn(i)){
             return;
         }
 
