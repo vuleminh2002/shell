@@ -28,7 +28,6 @@
 
 
 extern "C" {
-    #include "y.tab.h"     // Parser header
     #include <stdio.h>     // FILE*
     #include <stdlib.h>    // For malloc, free
     #include <string.h>    // For strcmp
