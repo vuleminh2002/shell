@@ -94,13 +94,14 @@ source[ \t]+[^ \t\n]+ {
         // Create a new buffer for the source file
         YY_BUFFER_STATE newBuffer = yy_create_buffer(fp, YY_BUF_SIZE);
         yy_switch_to_buffer(newBuffer);
-
+        Shell::_isSubshell = true;
         // Parse the file
         yyparse();
 
         // After parsing, return to old buffer
         yy_switch_to_buffer(bufferStack.top());
         bufferStack.pop();
+        Shell::_isSubshell = false;
         fclose(fp);
     }
 
@@ -194,7 +195,6 @@ source[ \t]+[^ \t\n]+ {
   close(pipeIn[1]);
 
   Shell::_isSubshell = true;
-
   int pid = fork();
   if (pid == 0) {
     //child process
