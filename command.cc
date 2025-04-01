@@ -100,7 +100,7 @@ void Command::print() {
     printf( "\n\n" );
 }
 
-bool Command::builtIn(int i) {
+bool Command::builtIn2(int i) {
     // If the first argument is "printenv"
 
     if (strcmp(_simpleCommands[i]->_arguments[0]->c_str(), "printenv") == 0)  {
@@ -126,10 +126,7 @@ void Command::execute() {
         return;
     }
     
-    if (builtIn(0)) {
-        // builtIn handled it in the parent; no need to fork
-        return;
-    }
+    
     // Print contents of Command data structure
     #ifdef PRINTING
         print();
@@ -237,6 +234,11 @@ void Command::execute() {
             // CHILD PROCESS
             signal(SIGINT, SIG_DFL); // handle ctr+c kill child process
             // Convert arguments from std::vector<std::string*> to char* array
+            if (builtIn2(0)) {
+                // builtIn handled it in the parent; no need to fork
+                return;
+            }
+            
             SimpleCommand *scmd = _simpleCommands[i];
             size_t argCount = scmd->_arguments.size();
             char **argv = new char*[argCount + 1];
