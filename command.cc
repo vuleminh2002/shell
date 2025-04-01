@@ -25,15 +25,7 @@
 #include <sys/types.h>
 #include <cstring>
 
-extern FILE *yyin;
-extern int yyparse();
 
-extern "C" {
-    typedef struct yy_buffer_state *YY_BUFFER_STATE;
-    YY_BUFFER_STATE yy_create_buffer(FILE *file, int size);
-    void yy_switch_to_buffer(YY_BUFFER_STATE new_buffer);
-    void yy_delete_buffer(YY_BUFFER_STATE buffer);
-}
 
 
 Command::Command() {
@@ -148,25 +140,7 @@ bool Command::builtIn(int i) {
 		return true;
 	}
 }
-/*
-void Command::handleSource(const std::string &filename) {
-    FILE *fp = fopen(filename.c_str(), "r");
-    if (!fp) {
-        perror(("source: cannot open " + filename).c_str());
-        return;
-    }
 
-    YY_BUFFER_STATE prev = yy_create_buffer(yyin, 8192);
-    YY_BUFFER_STATE src = yy_create_buffer(fp, 8192);
-
-    yy_switch_to_buffer(src);
-    yyparse();  // This will read the file line-by-line as if typed by user
-    yy_switch_to_buffer(prev);
-
-    yy_delete_buffer(src);
-    fclose(fp);
-}
-    */
 
 void Command::execute() {
     // Don't do anything if there are no simple commands
@@ -274,13 +248,7 @@ void Command::execute() {
             return;
         }
         
-        //if (_simpleCommands[i]->_arguments[0]->compare("source") == 0) {
-        //    std::string fileName = *(_simpleCommands[i]->_arguments[1]);
-        //    handleSource(fileName);
-        //    clear();
-        //    Shell::prompt();
-        //    return;
-       // }
+       
 
         //Step 4: fork a child.
         lastPid = fork();
@@ -298,34 +266,7 @@ void Command::execute() {
                 _exit(0); // Built-in executed; exit the child
             }
 
-            if (_simpleCommands[i]->_arguments[0]->compare("source") == 0 &&
-            _simpleCommands[i]->_arguments.size() > 1) {
-            
-                const std::string &filename = *_simpleCommands[i]->_arguments[1];
-                FILE *fp = fopen(filename.c_str(), "r");
-                if (!fp) {
-                    perror("source: fopen");
-                    exit(1);
-                }
-            
-                // Save current buffer
-                YY_BUFFER_STATE oldBuffer = YY_CURRENT_BUFFER;
-            
-                // Switch to source file input
-                YY_BUFFER_STATE fileBuffer = yy_create_buffer(fp, 8192);
-                yy_switch_to_buffer(fileBuffer);
-            
-                yyparse(); // Run parser on file
-            
-                // Restore buffer
-                yy_switch_to_buffer(oldBuffer);
-                yy_delete_buffer(fileBuffer);
-                fclose(fp);
-            
-                exit(0);  // Prevent further execvp
-            }
-        
-                        
+                     
             
             SimpleCommand *scmd = _simpleCommands[i];
             size_t argCount = scmd->_arguments.size();

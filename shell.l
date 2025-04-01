@@ -10,7 +10,15 @@
 
 #include <cstring>
 #include "y.tab.hh"
+extern FILE *yyin;
 
+// Flex buffer management functions
+extern "C" {
+    typedef struct yy_buffer_state *YY_BUFFER_STATE;
+    YY_BUFFER_STATE yy_create_buffer(FILE *file, int size);
+    void yy_switch_to_buffer(YY_BUFFER_STATE new_buffer);
+    void yy_delete_buffer(YY_BUFFER_STATE buffer);
+}
 static  void yyunput (int c,char *buf_ptr  );
 
 void myunputc(int c) {
@@ -61,6 +69,31 @@ void myunputc(int c) {
 
 "2>" {
   return GREAT2;
+}
+
+source[ \t]+[^ \t\n]+ {
+    // Extract filename
+    const char *filename = yytext + 6; // skip "source"
+    while (*filename == ' ' || *filename == '\t') {
+        filename++;
+    }
+
+    FILE *fp = fopen(filename, "r");
+    if (!fp) {
+        fprintf(stderr, "source: cannot open file %s\n", filename);
+        return NEWLINE;
+    }
+
+    // Save current buffer
+    bufferStackTop++;
+    bufferStack[bufferStackTop] = YY_CURRENT_BUFFER;
+
+    // Create new buffer for source file
+    YY_BUFFER_STATE newBuf = yy_create_buffer(fp, YY_BUF_SIZE);
+    yy_switch_to_buffer(newBuf);
+    yyin = fp;
+
+    return NEWLINE;  // So parser keeps going
 }
 
 \"([^\"\n]*)\" {
@@ -131,4 +164,6 @@ void myunputc(int c) {
 .  {
     return NOTOKEN;
 }
+
+
 
