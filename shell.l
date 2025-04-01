@@ -94,14 +94,14 @@ source[ \t]+[^ \t\n]+ {
         // Create a new buffer for the source file
         YY_BUFFER_STATE newBuffer = yy_create_buffer(fp, YY_BUF_SIZE);
         yy_switch_to_buffer(newBuffer);
-        Shell::_isSubshell = true;
+        //Shell::_isSubshell = true;
         // Parse the file
         yyparse();
 
         // After parsing, return to old buffer
         yy_switch_to_buffer(bufferStack.top());
         bufferStack.pop();
-        Shell::_isSubshell = false;
+        //Shell::_isSubshell = false;
         fclose(fp);
     }
 
