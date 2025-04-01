@@ -83,9 +83,7 @@ void myunputc(int c) {
   yylval.cpp_string = new std::string(result);
   return WORD;
 }
-  yylval.cpp_string = new std::string(result);
-  return WORD;
-}
+
 
 
 [^ \t\n|><][^ \t\n|><]*  {
