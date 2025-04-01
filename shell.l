@@ -69,17 +69,31 @@ void myunputc(int c) {
   return WORD;
 }
 
-[^ \t\n|><&"]*\\.+ {
+([^ \t\n|><&"]*\\[^ \t\n])+ {
   /*2.5 Escape*/
-  std::string result;
+ std::string result;
 for (int i = 0; i < yyleng; ++i) {
     if (yytext[i] == '\\') {
-        if (i + 1 < yyleng && yytext[i + 1] != ' ' && yytext[i + 1] != '\t' && yytext[i + 1] != '\n') {
-            result += yytext[i + 1];
-            i++; // Skip the next character (escaped one)
+        int count = 0;
+        // Count consecutive backslashes
+        while (i < yyleng && yytext[i] == '\\') {
+            count++;
+            i++;
+        }
+
+        if (i < yyleng && yytext[i] != ' ' && yytext[i] != '\t' && yytext[i] != '\n') {
+            // Escaping the next character
+            result.append(count / 2, '\\');  // Every 2 slashes → one literal
+            if (count % 2 == 1) {
+                result += yytext[i];         // Odd one left → escape next char
+                continue; // Already moved `i` forward above
+            } else {
+                i--; // step back so outer loop catches this non-escaped char
+            }
         } else {
-            // If the next character is a space or newline, treat backslash literally
-            result += yytext[i];
+            // Backslashes before space/tab/newline → treat as literal
+            result.append(count, '\\');
+            i--; // so outer loop sees the next char (space, etc.)
         }
     } else {
         result += yytext[i];
