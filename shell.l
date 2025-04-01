@@ -165,59 +165,68 @@ source[ \t]+[^ \t\n]+ {
 }
 
 \`[^\n\`]*\`|$\([^\n]*\) {
-  std::string str = std::string(yytext);
-  if (str.at(0) == '$') {
-    str = str.substr(1,str.size()-1);
+  /* 2.8 subshell */
+  // Strip the outer $(...) or backticks
+  std::string str(yytext);
+  if (str[0] == '$') {
+    str = str.substr(2, str.size()-3); //remove $()
   }
-  str = str.substr(1,str.size()-2);
+  else {
+    str = str.substr(1, str.size()-2); //remove `..`
+  }
   str += "\nexit\n";
-  //printf("str : %s",str.c_str());
 
-  int pin[2], pout[2], tmpin, tmpout;
-  tmpin = dup(0); tmpout = dup(1);
-  pipe(pin); pipe(pout);
+  int tempin = dup(0);
+  int tempout = dup(1);
 
-  dup2(pin[0], 0);
-  dup2(pout[1], 1);
-  close(pin[0]);
-  close(pout[1]);
+  //create two pipes
+  int pipeIn[2], pipeOut[2];
+  pipe(pipeIn);
+  pipe(pipeOut);
 
-  write(pin[1], str.c_str(), str.size());
-  close(pin[1]);
+  dup2(pipeIn[0], 0);
+  dup2(pipeOut[1], 1);
+  close(pipeIn[0]);
+  close(pipeOut[1]);
 
-  int ret = fork();
-  if (ret==0) {
-    char ** args = new char*[2];
-    args[0] = (char*)"/proc/self/exe";
-    args[1] = NULL;
+  write(pipeIn[1], str.c_str(), str.length());
+  close(pipeIn[1]);
+
+  int pid = fork();
+  if (pid == 0) {
+    //child process
+    char *args[] = { (char*)"/proc/self/exe", nullptr };
     execvp(args[0], args);
-    perror("execvp(subshell)");
+    perror("execvp (subshell)");
     exit(1);
-  } else if (ret < 0) {
-    perror("fork");
+  }
+  else if (pid < 0) {
+    perror("execvup (subshell)");
     exit(1);
   } else {
+    //parent process read the output
+    waitpid(pid, nullptr, 0);
 
-    waitpid(ret, NULL, 0);
+     // Restore original stdin/stdout
+    dup2(tempin, 0);
+    dup2(tempout, 1);
+    close(tempin);
+    close(tempout);
 
-    dup2(tmpin, 0);
-    dup2(tmpout, 1);
-    close(tmpin);
-    close(tmpout);
-  
-    int BUFSIZE = 1024;
-    char* c = new char[BUFSIZE];
-    int rd = read(pout[0], c, BUFSIZE);
-    close(pout[0]);
+    // Read from pout[0]
+    char buffer[4096] = {0};
+    int n = read(pipeOut[0], buffer, sizeof(buffer));
+    fprintf(stderr, "Subshell output inserted: [%s]\n", buffer);
+    close(pipeOut[0]);
 
-    //printf("output is %d, %d, %s", BUFSIZE, rd, c);
-    for (int i = rd - 12; i >= 0; --i ) {
-      if (c[i] == '\n') {
-        c[i] = '\t';
+    // Push the output back into the lexer input buffer
+    for (int i = n - 12; i >= 0; --i) {
+      if (buffer[i] == '\n') {
+        fprintf(stderr, "Subshell output inserted: [%s]\n", buffer[i]);
+        buffer[i] = '\t';  // Avoid newlines breaking parsing
       }
-      myunputc( c[i] );
+      myunputc(buffer[i]);
     }
-    delete c;
   }
 }
 

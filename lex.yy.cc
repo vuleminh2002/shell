@@ -1108,74 +1108,65 @@ case 15:
 YY_RULE_SETUP
 #line 167 "shell.l"
 {
-  /* 2.8 subshell */
-  // Strip the outer $(...) or backticks
-  std::string str(yytext);
-  if (str[0] == '$') {
-    str = str.substr(2, str.size()-3); //remove $()
+  std::string str = std::string(yytext);
+  if (str.at(0) == '$') {
+    str = str.substr(1,str.size()-1);
   }
-  else {
-    str = str.substr(1, str.size()-2); //remove `..`
-  }
+  str = str.substr(1,str.size()-2);
   str += "\nexit\n";
+  //printf("str : %s",str.c_str());
 
-  int tempin = dup(0);
-  int tempout = dup(1);
+  int pin[2], pout[2], tmpin, tmpout;
+  tmpin = dup(0); tmpout = dup(1);
+  pipe(pin); pipe(pout);
 
-  //create two pipes
-  int pipeIn[2], pipeOut[2];
-  pipe(pipeIn);
-  pipe(pipeOut);
+  dup2(pin[0], 0);
+  dup2(pout[1], 1);
+  close(pin[0]);
+  close(pout[1]);
 
-  dup2(pipeIn[0], 0);
-  dup2(pipeOut[1], 1);
-  close(pipeIn[0]);
-  close(pipeOut[1]);
+  write(pin[1], str.c_str(), str.size());
+  close(pin[1]);
 
-  write(pipeIn[1], str.c_str(), str.length());
-  close(pipeIn[1]);
-
-  int pid = fork();
-  if (pid == 0) {
-    //child process
-    char *args[] = { (char*)"/proc/self/exe", nullptr };
+  int ret = fork();
+  if (ret==0) {
+    char ** args = new char*[2];
+    args[0] = (char*)"/proc/self/exe";
+    args[1] = NULL;
     execvp(args[0], args);
-    perror("execvp (subshell)");
+    perror("execvp(subshell)");
     exit(1);
-  }
-  else if (pid < 0) {
-    perror("execvup (subshell)");
+  } else if (ret < 0) {
+    perror("fork");
     exit(1);
   } else {
-    //parent process read the output
-    waitpid(pid, nullptr, 0);
 
-     // Restore original stdin/stdout
-    dup2(tempin, 0);
-    dup2(tempout, 1);
-    close(tempin);
-    close(tempout);
+    waitpid(ret, NULL, 0);
 
-    // Read from pout[0]
-    char buffer[4096] = {0};
-    int n = read(pipeOut[0], buffer, sizeof(buffer));
-    fprintf(stderr, "Subshell output inserted: [%s]\n", buffer);
-    close(pipeOut[0]);
+    dup2(tmpin, 0);
+    dup2(tmpout, 1);
+    close(tmpin);
+    close(tmpout);
+  
+    int BUFSIZE = 1024;
+    char* c = new char[BUFSIZE];
+    int rd = read(pout[0], c, BUFSIZE);
+    close(pout[0]);
 
-    // Push the output back into the lexer input buffer
-    for (int i = n - 12; i >= 0; --i) {
-      if (buffer[i] == '\n') {
-        
-        buffer[i] = '\t';  // Avoid newlines breaking parsing
+    //printf("output is %d, %d, %s", BUFSIZE, rd, c);
+    for (int i = rd - 12; i >= 0; --i ) {
+      if (c[i] == '\n') {
+        c[i] = '\t';
       }
-      myunputc(buffer[i]);
+      myunputc( c[i] );
     }
+    delete c;
   }
 }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 233 "shell.l"
+#line 224 "shell.l"
 {
   /* Assume that file names have only alpha chars */
   yylval.cpp_string = new std::string(yytext);
@@ -1184,17 +1175,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 239 "shell.l"
+#line 230 "shell.l"
 {
     return NOTOKEN;
 }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 245 "shell.l"
+#line 236 "shell.l"
 ECHO;
 	YY_BREAK
-#line 1198 "lex.yy.cc"
+#line 1189 "lex.yy.cc"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2211,4 +2202,4 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 245 "shell.l"
+#line 236 "shell.l"
