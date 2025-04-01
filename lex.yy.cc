@@ -384,13 +384,13 @@ struct yy_trans_info
 static const flex_int16_t yy_accept[79] =
     {   0,
         0,    0,   19,   16,    2,    1,   16,   16,    4,   16,
-        5,    6,   15,   16,   16,    3,   16,   16,   15,   16,
-        0,   13,   16,   15,   16,   10,    7,    8,   15,   15,
-       15,   15,   16,    0,   16,   15,   11,   16,   13,   13,
-       15,   13,   15,   15,   15,   16,    0,   16,   11,   15,
-        9,   11,   11,   15,   15,   15,   15,   11,   16,   13,
-       13,   11,   11,   15,   15,   11,   15,   15,   11,   11,
-       16,   11,   11,   16,   16,    0,   12,    0
+        5,    6,   14,   16,   16,    3,   16,   16,   14,   16,
+        0,   12,   16,   14,   16,   10,    7,    8,   14,   14,
+       14,   14,   16,    0,   16,   14,   15,   16,   12,   12,
+       14,   12,   14,   14,   14,   16,    0,   16,   15,   14,
+        9,   15,   15,   14,   14,   14,   14,   14,   16,   12,
+       12,   15,   15,   14,   14,   14,   14,   14,   14,   14,
+       16,   14,   14,   16,   16,    0,   11,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -1010,7 +1010,103 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 81 "shell.l"
+#line 83 "shell.l"
+{
+    std::string filename(yytext + 7); // Skip "source "
+    FILE *fp = fopen(filename.c_str(), "r");
+
+    if (!fp) {
+        fprintf(stderr, "source: cannot open file %s\n", filename.c_str());
+    } else {
+        // Save current buffer
+        bufferStack.push(YY_CURRENT_BUFFER);
+
+        // Create a new buffer for the source file
+        YY_BUFFER_STATE newBuffer = yy_create_buffer(fp, YY_BUF_SIZE);
+        yy_switch_to_buffer(newBuffer);
+
+        // Parse the file
+        yyparse();
+
+        // After parsing, return to old buffer
+        yy_switch_to_buffer(bufferStack.top());
+        bufferStack.pop();
+        fclose(fp);
+    }
+
+    return NEWLINE; // simulate a newline after running source
+}
+	YY_BREAK
+case 12:
+YY_RULE_SETUP
+#line 109 "shell.l"
+{
+  /*matching quote*/
+  yylval.cpp_string = new std::string(yytext + 1, yyleng - 2);
+  return WORD;
+}
+	YY_BREAK
+case 13:
+YY_RULE_SETUP
+#line 115 "shell.l"
+{
+	/* 2.4: Quotes */
+	
+	yylval.cpp_string = new std::string(yytext);
+	*yylval.cpp_string = yylval.cpp_string->substr(1, yylval.cpp_string->length()-2);
+
+	/*printf("after dequote, string = %s\n",yylval.cpp_string);*/
+	return WORD;
+}
+	YY_BREAK
+case 14:
+YY_RULE_SETUP
+#line 125 "shell.l"
+{
+    /*2.5 escaping */
+
+    char *src = strdup(yytext);
+    int length = strlen(src);
+
+    char *dest = (char *)malloc(length + 1);  // Enough space for worst case
+    int idx = 0;
+
+    // Iterate over each char in src
+    for (int j = 0; j < length; j++) {
+        if (src[j] == '\\') {
+            // Check if next char is also a backslash
+            if ((j + 1) < length && src[j + 1] == '\\') {
+                // Two backslashes => produce one '\'
+                dest[idx++] = '\\';
+                j++;   // Skip the next '\'
+            } else {
+                // Single backslash => skip it, output the next char
+                j++;
+                if (j < length) {
+                    dest[idx++] = src[j];
+                }
+            }
+        } else {
+            // Normal character
+            dest[idx++] = src[j];
+        }
+    }
+
+    // Null-terminate
+    dest[idx] = '\0';
+
+    // Assign to yylval and return
+    yylval.cpp_string = new std::string(dest);
+
+    free(src);
+    free(dest);
+
+    return WORD;
+}
+	YY_BREAK
+case 15:
+YY_RULE_SETUP
+#line 167 "shell.l"
 {
   /* 2.8 subshell */
   // Strip the outer $(...) or backticks
@@ -1074,104 +1170,7 @@ YY_RULE_SETUP
       }
       myunputc(buffer[i]);
     }
-    delete buffer;
   }
-}
-	YY_BREAK
-case 12:
-YY_RULE_SETUP
-#line 148 "shell.l"
-{
-    std::string filename(yytext + 7); // Skip "source "
-    FILE *fp = fopen(filename.c_str(), "r");
-
-    if (!fp) {
-        fprintf(stderr, "source: cannot open file %s\n", filename.c_str());
-    } else {
-        // Save current buffer
-        bufferStack.push(YY_CURRENT_BUFFER);
-
-        // Create a new buffer for the source file
-        YY_BUFFER_STATE newBuffer = yy_create_buffer(fp, YY_BUF_SIZE);
-        yy_switch_to_buffer(newBuffer);
-
-        // Parse the file
-        yyparse();
-
-        // After parsing, return to old buffer
-        yy_switch_to_buffer(bufferStack.top());
-        bufferStack.pop();
-        fclose(fp);
-    }
-
-    return NEWLINE; // simulate a newline after running source
-}
-	YY_BREAK
-case 13:
-YY_RULE_SETUP
-#line 174 "shell.l"
-{
-  /*matching quote*/
-  yylval.cpp_string = new std::string(yytext + 1, yyleng - 2);
-  return WORD;
-}
-	YY_BREAK
-case 14:
-YY_RULE_SETUP
-#line 180 "shell.l"
-{
-	/* 2.4: Quotes */
-	
-	yylval.cpp_string = new std::string(yytext);
-	*yylval.cpp_string = yylval.cpp_string->substr(1, yylval.cpp_string->length()-2);
-
-	/*printf("after dequote, string = %s\n",yylval.cpp_string);*/
-	return WORD;
-}
-	YY_BREAK
-case 15:
-YY_RULE_SETUP
-#line 190 "shell.l"
-{
-    /*2.5 escaping */
-
-    char *src = strdup(yytext);
-    int length = strlen(src);
-
-    char *dest = (char *)malloc(length + 1);  // Enough space for worst case
-    int idx = 0;
-
-    // Iterate over each char in src
-    for (int j = 0; j < length; j++) {
-        if (src[j] == '\\') {
-            // Check if next char is also a backslash
-            if ((j + 1) < length && src[j + 1] == '\\') {
-                // Two backslashes => produce one '\'
-                dest[idx++] = '\\';
-                j++;   // Skip the next '\'
-            } else {
-                // Single backslash => skip it, output the next char
-                j++;
-                if (j < length) {
-                    dest[idx++] = src[j];
-                }
-            }
-        } else {
-            // Normal character
-            dest[idx++] = src[j];
-        }
-    }
-
-    // Null-terminate
-    dest[idx] = '\0';
-
-    // Assign to yylval and return
-    yylval.cpp_string = new std::string(dest);
-
-    free(src);
-    free(dest);
-
-    return WORD;
 }
 	YY_BREAK
 case 16:
@@ -1195,7 +1194,7 @@ YY_RULE_SETUP
 #line 245 "shell.l"
 ECHO;
 	YY_BREAK
-#line 1199 "lex.yy.cc"
+#line 1198 "lex.yy.cc"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
