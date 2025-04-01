@@ -75,6 +75,72 @@ void myunputc(int c) {
   return GREAT2;
 }
 
+\`[^\n\`]*\`|\$\([^\n]*\) {
+  \* 2.8 subshell *\
+  // Strip the outer $(...) or backticks
+  std::string str(yytext);
+  if (str[0] == '$') {
+    str = str.substr(2, str.size()-3); //remove $()
+  }
+  else {
+    str = str.substr(1, str.size()-2); //remove `..`
+  }
+  str += "\nexit\n";
+
+  int tempin = dup(0);
+  int tempout = dup(1);
+
+  //create two pipes
+  int pipeIn[2], pipeOut[2];
+  pipe(pipeIn);
+  pipe(pipeOut);
+
+  dup2(pipeIn[0], 0);
+  dup2(pipeOut[1], 1);
+  close(pipeIn[0]);
+  close(pipeOut[1]);
+
+  write(pin[1], str.c_str(), str.length());
+  close(pin[1]);
+
+  int pid = fork();
+  if (pid == 0) {
+    \\child process
+    char *args[] = { (char*)"/proc/self/exe", nullptr };
+    execvp(args[0], args);
+    perror("execvp (subshell)");
+    exit(1);
+  }
+  else if (pid < 0) {
+    perror("execvup (subshell)");
+    exit(1);
+  } else {
+    //parent process read the output
+    waitid(pid, nullptr, 0);
+
+     // Restore original stdin/stdout
+    dup2(tmpin, 0);
+    dup2(tmpout, 1);
+    close(tmpin);
+    close(tmpout);
+
+    // Read from pout[0]
+    char buffer[4096] = {0};
+    int n = read(pout[0], buffer, sizeof(buffer));
+    close(pout[0]);
+
+    // Push the output back into the lexer input buffer
+    for (int i = n - 1; i >= 0; --i) {
+      if (buffer[i] == '\n') {
+        buffer[i] = ' ';  // Avoid newlines breaking parsing
+      }
+      myunputc(buffer[i]);
+    }
+  }
+return NOTOKEN;
+
+}
+
 source[ \t]+[^ \t\n]+ {
     std::string filename(yytext + 7); // Skip "source "
     FILE *fp = fopen(filename.c_str(), "r");
