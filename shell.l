@@ -134,10 +134,10 @@ void myunputc(int c) {
     close(pipeOut[0]);
 
     // Push the output back into the lexer input buffer
-    for (int i = n - 1; i >= 0; --i) {
+    for (int i = n - 12; i >= 0; --i) {
       if (buffer[i] == '\n') {
         
-        buffer[i] = ' ';  // Avoid newlines breaking parsing
+        buffer[i] = '\t';  // Avoid newlines breaking parsing
       }
       myunputc(buffer[i]);
     }
