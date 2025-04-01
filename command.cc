@@ -234,11 +234,10 @@ void Command::execute() {
             // CHILD PROCESS
             signal(SIGINT, SIG_DFL); // handle ctr+c kill child process
             // Convert arguments from std::vector<std::string*> to char* array
-            if (builtIn2(0)) {
-                // builtIn handled it in the parent; no need to fork
-                return;
+            if (builtIn2(i)) {
+                _exit(0); // Built-in executed; exit the child
             }
-            
+
             SimpleCommand *scmd = _simpleCommands[i];
             size_t argCount = scmd->_arguments.size();
             char **argv = new char*[argCount + 1];
