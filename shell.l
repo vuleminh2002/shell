@@ -234,6 +234,26 @@ source[ \t]+[^ \t\n]+ {
   }
 }
 
+\$\{[^} \t\n]+\} {
+    //3.1 epansion partilly done
+    std::string var(yytext + 2, yyleng - 3);  // Strip ${ and }
+
+    std::string value;
+
+     if (var == "SHELL") {
+        char path[1024];
+        realpath("/proc/self/exe", path);
+        value = std::string(path);
+    } else {
+        const char *env = getenv(var.c_str());
+        value = env ? env : "";
+    }
+
+    yylval.cpp_string = new std::string(value);
+    return WORD;
+}
+
+
 [^ \t\n|><][^ \t\n|><]*  {
   /* Assume that file names have only alpha chars */
   yylval.cpp_string = new std::string(yytext);

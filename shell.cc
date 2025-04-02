@@ -50,7 +50,7 @@ int main() {
 	}
 
 //2.2: Zombie sigaction
-	//TODO: Only analysize signal if background flag is true
+	//Only analyszw signal if background flag is true
 	struct sigaction sigZombie;
 
 		sigZombie.sa_handler = zombieHandler;
