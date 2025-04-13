@@ -234,39 +234,24 @@ source[ \t]+[^ \t\n]+ {
   }
 }
 
-$\{[^ \}\n]*\}([^ \n]*|$\{[^ \}\n]*\})* {
-    //3.1 epansion partially done
-    std::string var(yytext + 2, yyleng - 3);  // Strip ${ and }
-    
-    std::string value;
-
-    if (var == "$") {
-        value = std::to_string(getpid());
-    } else if (var == "?") {
-        value = std::to_string(Shell::_lastStatus);
-    } else if (var == "!") {
-        value = std::to_string(Shell::_lastBackgroundPid);
-    } else if (var == "_") {
-        value = Shell::_lastArg;
-    } else if (var == "SHELL") {
-        char path[1024];
-        realpath("/proc/self/exe", path);
-        value = path;
-    } else {
-        //printf("dcmm\n");
-        const char *env = getenv(var.c_str());
-        value = env ? env : "";
-    }
-
-    yylval.cpp_string = new std::string(value);
-    return WORD;
-}
 
 
 [^ \t\n|><][^ \t\n|><]*  {
   /* Assume that file names have only alpha chars */
   yylval.cpp_string = new std::string(yytext);
   return WORD;
+}
+
+// Ignore whitespace
+[ \t\n]+  { /* do nothing */ }
+
+// Catch-all for non-whitespace
+[^ \t\n]+ {
+    std::string raw(yytext);
+    // Expand environment variables in raw
+    std::string expanded = expandAllEnv(raw);
+    yylval.cpp_string = new std::string(expanded);
+    return WORD;
 }
 
 .  {

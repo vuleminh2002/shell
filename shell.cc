@@ -26,6 +26,55 @@ extern "C" void zombieHandler(int sig){
 	  //printf("[%d] exited.\n", pid);
 }
 
+static std::string lookupVar(const std::string &varName) {
+    // This function decides how to interpret each var:
+    // e.g., $! => Shell::_lastBackgroundPid, $? => Shell::_lastStatus, ...
+    if (varName == "!") {
+        // last background PID
+        return std::to_string(Shell::_lastBackgroundPid);
+    } else if (varName == "?") {
+        return std::to_string(Shell::_lastStatus);
+    } else if (varName == "_") {
+        return Shell::_lastArg;
+    } else if (varName == "SHELL") {
+        char path[1024];
+        if (realpath("/proc/self/exe", path)) {
+            return std::string(path);
+        } else {
+            return "/proc/self/exe"; // fallback
+        }
+    } else {
+        // a normal environment variable
+        const char *val = getenv(varName.c_str());
+        return val ? val : "";
+    }
+}
+
+static std::string expandAllEnv(const std::string &input) {
+    // We apply expansions in a loop until no more matches found.
+    // This ensures multiple expansions in one token are replaced.
+    std::string result = input;
+
+    // Pattern A: ${var}
+    std::regex curlyPattern("\\$\\{([^}]+)\\}");
+
+    bool changed = true;
+    while (changed) {
+        changed = false;
+            std::smatch match;
+            if (std::regex_search(result, match, curlyPattern)) {
+                // e.g. match[1] => the var name
+                std::string varName = match[1].str();
+                std::string expansion = lookupVar(varName);
+
+                // Replace first occurrence
+                result.replace(match.position(0), match.length(0), expansion);
+                changed = true;  // We made at least one replacement
+            }
+    }
+
+    return result;
+}
 
 
 bool Shell::_isSubshell = false;
