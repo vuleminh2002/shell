@@ -237,7 +237,7 @@ source[ \t]+[^ \t\n]+ {
 \$\{[^} \t\n]+\} {
     //3.1 epansion partially done
     std::string var(yytext + 2, yyleng - 3);  // Strip ${ and }
-    printf("%s\n", var);
+    
     std::string value;
 
     if (var == "$") {
@@ -253,6 +253,7 @@ source[ \t]+[^ \t\n]+ {
         realpath("/proc/self/exe", path);
         value = path;
     } else {
+        //printf("dcmm\n");
         const char *env = getenv(var.c_str());
         value = env ? env : "";
     }
