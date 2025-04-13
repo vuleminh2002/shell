@@ -229,6 +229,7 @@ source[ \t]+[^ \t\n]+ {
       }
       myunputc(c);
     }
+  }
 }
 
 [ \t\n]+  { /* do nothing */ }
