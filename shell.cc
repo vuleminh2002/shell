@@ -44,8 +44,6 @@ extern "C" void zombieHandler(int sig){
     while (changed) {
         changed = false;
 
-        // 1) Expand curly:  ${VAR}
-        {
             std::smatch match;
             if (std::regex_search(result, match, curlyPattern)) {
                 // e.g. match[1] => the var name
@@ -56,8 +54,6 @@ extern "C" void zombieHandler(int sig){
                 result.replace(match.position(0), match.length(0), expansion);
                 changed = true;  // We made at least one replacement
             }
-        }
-
     }
 
     return result;

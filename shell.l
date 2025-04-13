@@ -240,11 +240,14 @@ source[ \t]+[^ \t\n]+ {
   return WORD;
 }
 
+// Ignore whitespace
+[ \t\n]+  { /* do nothing */ }
+
+// Catch-all for non-whitespace
 [^ \t\n]+ {
-    // This entire chunk is one token
-    std::string token(yytext);
-    // Expand any and all ${...} inside
-    std::string expanded = expandAllEnv(token);
+    std::string raw(yytext);
+    // Expand environment variables in raw
+    std::string expanded = expandAllEnv(raw);
     yylval.cpp_string = new std::string(expanded);
     return WORD;
 }
