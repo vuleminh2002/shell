@@ -32,31 +32,6 @@ extern "C" void zombieHandler(int sig){
 	while (waitpid(-1, NULL, WNOHANG) > 0) {};
 	  //printf("[%d] exited.\n", pid);
 }
-
-static std::string lookupVar(const std::string &varName) {
-    // This function decides how to interpret each var:
-    // e.g., $! => Shell::_lastBackgroundPid, $? => Shell::_lastStatus, ...
-    if (varName == "!") {
-        // last background PID
-        return std::to_string(Shell::_lastBackgroundPid);
-    } else if (varName == "?") {
-        return std::to_string(Shell::_lastStatus);
-    } else if (varName == "_") {
-        return Shell::_lastArg;
-    } else if (varName == "SHELL") {
-        char path[1024];
-        if (realpath("/proc/self/exe", path)) {
-            return std::string(path);
-        } else {
-            return "/proc/self/exe"; // fallback
-        }
-    } else {
-        // a normal environment variable
-        const char *val = getenv(varName.c_str());
-        return val ? val : "";
-    }
-}
-
 static std::string expandAllEnv(const std::string &input) {
     // We apply expansions in a loop until no more matches found.
     // This ensures multiple expansions in one token are replaced.
@@ -87,6 +62,31 @@ static std::string expandAllEnv(const std::string &input) {
 
     return result;
 }
+static std::string lookupVar(const std::string &varName) {
+    // This function decides how to interpret each var:
+    // e.g., $! => Shell::_lastBackgroundPid, $? => Shell::_lastStatus, ...
+    if (varName == "!") {
+        // last background PID
+        return std::to_string(Shell::_lastBackgroundPid);
+    } else if (varName == "?") {
+        return std::to_string(Shell::_lastStatus);
+    } else if (varName == "_") {
+        return Shell::_lastArg;
+    } else if (varName == "SHELL") {
+        char path[1024];
+        if (realpath("/proc/self/exe", path)) {
+            return std::string(path);
+        } else {
+            return "/proc/self/exe"; // fallback
+        }
+    } else {
+        // a normal environment variable
+        const char *val = getenv(varName.c_str());
+        return val ? val : "";
+    }
+}
+
+
 
 
 bool Shell::_isSubshell = false;
