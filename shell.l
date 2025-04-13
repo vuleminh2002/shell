@@ -28,7 +28,6 @@ extern void yy_delete_buffer(YY_BUFFER_STATE);
 std::stack<YY_BUFFER_STATE> bufferStack;
 
 static  void yyunput (int c,char *buf_ptr  );
-static std::string expandAllEnv(const std::string &input);
 
 void myunputc(int c) {
   unput(c);
@@ -235,23 +234,20 @@ source[ \t]+[^ \t\n]+ {
   }
 }
 
-[ \t\n]+  { /* do nothing */ }
-
-[^ \t\n]+ {
-    std::string raw(yytext);
-    // Expand environment variables in raw
-    std::string expanded = expandAllEnv(raw);
-    yylval.cpp_string = new std::string(expanded);
-    return WORD;
-}
-
 [^ \t\n|><][^ \t\n|><]*  {
   /* Assume that file names have only alpha chars */
   yylval.cpp_string = new std::string(yytext);
   return WORD;
 }
 
-
+[^ \t\n]+ {
+    // This entire chunk is one token
+    std::string token(yytext);
+    // Expand any and all ${...} inside
+    std::string expanded = expandAllEnv(token);
+    yylval.cpp_string = new std::string(expanded);
+    return WORD;
+}
 
 .  {
     return NOTOKEN;
