@@ -162,7 +162,7 @@ bool Command::builtIn(int i) {
         Shell::_isSubshell = false;
         clear();
         Shell::prompt();
-        return true;  // Make sure we **don't fall through** and execute anything else
+        return true;  
     }
 
     return false;
@@ -297,6 +297,7 @@ void Command::execute() {
             
             SimpleCommand *scmd = _simpleCommands[i];
             size_t argCount = scmd->_arguments.size();
+            Shell::_lastArg = *scmd->_arguments[argCount - 1];
             char **argv = new char*[argCount + 1];
             for (size_t j = 0; j < argCount; j++) {
                 argv[j] = const_cast<char*>(scmd->_arguments[j]->c_str());
@@ -323,6 +324,10 @@ void Command::execute() {
 
     if (!_background) {
         waitpid(lastPid, nullptr, 0);
+        Shell::_lastStatus = WEXITSTATUS(status);
+    }
+    else{
+        Shell::_lastBackgroundPid = lastPid;
     }
 
     

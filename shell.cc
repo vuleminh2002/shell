@@ -8,6 +8,9 @@
 #include "shell.hh"
 //void yyrestart(FILE * file);
 int yyparse(void);
+Shell::_lastStatus = 0;
+Shell::_lastBackgroundPid = -1;
+Shell::_lastArg = "";
 //function to handle signal interupt ctr+c
 extern "C" void ctrlC(int sig) {
 	//fflush(stdin);

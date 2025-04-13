@@ -235,15 +235,23 @@ source[ \t]+[^ \t\n]+ {
 }
 
 \$\{[^} \t\n]+\} {
-    //3.1 epansion partilly done
+    //3.1 epansion partially done
     std::string var(yytext + 2, yyleng - 3);  // Strip ${ and }
 
     std::string value;
 
-     if (var == "SHELL") {
+    if (var == "$") {
+        value = std::to_string(getpid());
+    } else if (var == "?") {
+        value = std::to_string(Shell::_lastStatus);
+    } else if (var == "!") {
+        value = std::to_string(Shell::_lastBackgroundPid);
+    } else if (var == "_") {
+        value = Shell::_lastArg;
+    } else if (var == "SHELL") {
         char path[1024];
         realpath("/proc/self/exe", path);
-        value = std::string(path);
+        value = path;
     } else {
         const char *env = getenv(var.c_str());
         value = env ? env : "";
