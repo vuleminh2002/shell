@@ -244,9 +244,6 @@ source[ \t]+[^ \t\n]+ {
     return WORD;
 }
 
-
-
-
 .  {
     return NOTOKEN;
 }

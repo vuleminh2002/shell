@@ -59,8 +59,10 @@ extern "C" void zombieHandler(int sig){
     return result;
 }
  std::string lookupVar(const std::string &varName) {
-    // This function decides how to interpret each var:
-    // e.g., $! => Shell::_lastBackgroundPid, $? => Shell::_lastStatus, ...
+	if(varName == "$"){
+		value = std::to_string(getpid());
+		return value;
+	}
     if (varName == "!") {
         // last background PID
         return std::to_string(Shell::_lastBackgroundPid);
