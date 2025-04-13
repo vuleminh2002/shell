@@ -237,7 +237,6 @@ source[ \t]+[^ \t\n]+ {
 
 [ \t\n]+  { /* do nothing */ }
 
-// Catch-all for non-whitespace
 [^ \t\n]+ {
     std::string raw(yytext);
     // Expand environment variables in raw
