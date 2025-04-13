@@ -15,8 +15,8 @@ int Shell::_lastStatus = 0;
 int Shell::_lastBackgroundPid = -1;
 std::string Shell::_lastArg = "";
 
-static std::string expandAllEnv(const std::string &input);
-static std::string lookupVar(const std::string &varName);
+std::string expandAllEnv(const std::string &input);
+std::string lookupVar(const std::string &varName);
 
 //function to handle signal interupt ctr+c
 extern "C" void ctrlC(int sig) {
@@ -32,7 +32,7 @@ extern "C" void zombieHandler(int sig){
 	while (waitpid(-1, NULL, WNOHANG) > 0) {};
 	  //printf("[%d] exited.\n", pid);
 }
-static std::string expandAllEnv(const std::string &input) {
+ std::string expandAllEnv(const std::string &input) {
     // We apply expansions in a loop until no more matches found.
     // This ensures multiple expansions in one token are replaced.
     std::string result = input;
@@ -62,7 +62,7 @@ static std::string expandAllEnv(const std::string &input) {
 
     return result;
 }
-static std::string lookupVar(const std::string &varName) {
+ std::string lookupVar(const std::string &varName) {
     // This function decides how to interpret each var:
     // e.g., $! => Shell::_lastBackgroundPid, $? => Shell::_lastStatus, ...
     if (varName == "!") {
