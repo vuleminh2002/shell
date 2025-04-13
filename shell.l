@@ -235,14 +235,6 @@ source[ \t]+[^ \t\n]+ {
   }
 }
 
-
-
-[^ \t\n|><][^ \t\n|><]*  {
-  /* Assume that file names have only alpha chars */
-  yylval.cpp_string = new std::string(yytext);
-  return WORD;
-}
-
 // Ignore whitespace
 [ \t\n]+  { /* do nothing */ }
 
@@ -254,6 +246,15 @@ source[ \t]+[^ \t\n]+ {
     yylval.cpp_string = new std::string(expanded);
     return WORD;
 }
+
+
+[^ \t\n|><][^ \t\n|><]*  {
+  /* Assume that file names have only alpha chars */
+  yylval.cpp_string = new std::string(yytext);
+  return WORD;
+}
+
+
 
 .  {
     return NOTOKEN;
