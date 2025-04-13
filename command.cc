@@ -235,7 +235,14 @@ void Command::execute() {
 
     //step 3: Loop over simpleCommand
     for (size_t i = 0; i < _simpleCommands.size(); i++) {
-        //printf("got into the loop baby");
+	SimpleCommand *scmd = _simpleCommands[i];
+
+    // Set _lastArg in the **parent** BEFORE forking
+    	if (!scmd->_arguments.empty()) {
+        	Shell::_lastArg = *(scmd->_arguments.back());
+    	}	  
+      
+	    //printf("got into the loop baby");
         dup2(fdin, 0);
         close(fdin);
         //if last SimpleCommand (process the output)
@@ -295,9 +302,8 @@ void Command::execute() {
 
                      
             
-            SimpleCommand *scmd = _simpleCommands[i];
             size_t argCount = scmd->_arguments.size();
-            Shell::_lastArg = *scmd->_arguments[argCount - 1];
+  
             char **argv = new char*[argCount + 1];
             for (size_t j = 0; j < argCount; j++) {
                 argv[j] = const_cast<char*>(scmd->_arguments[j]->c_str());
