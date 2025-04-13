@@ -1197,14 +1197,14 @@ YY_RULE_SETUP
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 250 "shell.l"
+#line 247 "shell.l"
 {
     return NOTOKEN;
 }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 256 "shell.l"
+#line 253 "shell.l"
 ECHO;
 	YY_BREAK
 #line 1211 "lex.yy.cc"
@@ -2224,4 +2224,4 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 256 "shell.l"
+#line 253 "shell.l"

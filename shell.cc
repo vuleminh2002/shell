@@ -60,7 +60,7 @@ extern "C" void zombieHandler(int sig){
 }
  std::string lookupVar(const std::string &varName) {
 	if(varName == "$"){
-		value = std::to_string(getpid());
+		std::string value = std::to_string(getpid());
 		return value;
 	}
     if (varName == "!") {
