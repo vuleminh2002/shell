@@ -236,14 +236,13 @@ source[ \t]+[^ \t\n]+ {
 
 [ \t\n]+  { /* do nothing */ }
 
-[^ \t\n]+ {
+[^ \t\n|><][^ \t\n|><]*  {
     std::string raw(yytext);
     // Expand environment variables in raw
     std::string expanded = expandAllEnv(raw);
     yylval.cpp_string = new std::string(expanded);
     return WORD;
 }
-
 
 
 
