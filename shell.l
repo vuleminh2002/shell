@@ -28,6 +28,7 @@ extern void yy_delete_buffer(YY_BUFFER_STATE);
 std::stack<YY_BUFFER_STATE> bufferStack;
 
 static  void yyunput (int c,char *buf_ptr  );
+static std::string expandAllEnv(const std::string &input);
 
 void myunputc(int c) {
   unput(c);
