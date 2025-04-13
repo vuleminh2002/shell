@@ -234,7 +234,7 @@ source[ \t]+[^ \t\n]+ {
   }
 }
 
-\$\{[^} \t\n]+\} {
+$\{[^ \}\n]*\}([^ \n]*|$\{[^ \}\n]*\})* {
     //3.1 epansion partially done
     std::string var(yytext + 2, yyleng - 3);  // Strip ${ and }
     
