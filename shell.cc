@@ -6,6 +6,9 @@
 #include <sys/types.h>  // for pid_t (optional but good practice)
 #include <sys/wait.h>  
 #include "shell.hh"
+#include <regex>
+#include <string>
+#include <iostream>
 //void yyrestart(FILE * file);
 int yyparse(void);
 int Shell::_lastStatus = 0;
