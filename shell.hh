@@ -11,8 +11,7 @@ struct Shell {
   static int _lastStatus;
   static int _lastBackgroundPid;
   static std::string _lastArg;
-  std::string expandAllEnv(const std::string &input);
-  std::string lookupVar(const std::string &varName);
+
 };
 
 #endif
