@@ -235,7 +235,7 @@ source[ \t]+[^ \t\n]+ {
 
 [^ \|>\t\n][^ \|>\t\n]*  {
   /* Assume that file names have only alpha chars */
-  yylval.cpp_string = new std::string(yytext);
+  std::string raw(yytext); 
   std::string expanded = expandAllEnv(raw);
   yylval.cpp_string = new std::string(expanded);
   return WORD;
