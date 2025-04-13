@@ -234,10 +234,8 @@ source[ \t]+[^ \t\n]+ {
   }
 }
 
-// Ignore whitespace
 [ \t\n]+  { /* do nothing */ }
 
-// Catch-all for non-whitespace
 [^ \t\n]+ {
     std::string raw(yytext);
     // Expand environment variables in raw
