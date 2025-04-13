@@ -1231,10 +1231,18 @@ YY_RULE_SETUP
 
     std::string value;
 
-     if (var == "SHELL") {
+    if (var == "$") {
+        value = std::to_string(getpid());
+    } else if (var == "?") {
+        value = std::to_string(Shell::_lastStatus);
+    } else if (var == "!") {
+        value = std::to_string(Shell::_lastBackgroundPid);
+    } else if (var == "_") {
+        value = Shell::_lastArg;
+    } else if (var == "SHELL") {
         char path[1024];
         realpath("/proc/self/exe", path);
-        value = std::string(path);
+        value = path;
     } else {
         const char *env = getenv(var.c_str());
         value = env ? env : "";
@@ -1246,7 +1254,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 257 "shell.l"
+#line 265 "shell.l"
 {
   /* Assume that file names have only alpha chars */
   yylval.cpp_string = new std::string(yytext);
@@ -1255,17 +1263,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 263 "shell.l"
+#line 271 "shell.l"
 {
     return NOTOKEN;
 }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 269 "shell.l"
+#line 277 "shell.l"
 ECHO;
 	YY_BREAK
-#line 1269 "lex.yy.cc"
+#line 1277 "lex.yy.cc"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2282,4 +2290,4 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 269 "shell.l"
+#line 277 "shell.l"

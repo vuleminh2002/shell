@@ -7,10 +7,10 @@ struct Shell {
 
   static void prompt();
   static bool _isSubshell;
-  Shell::_lastStatus;
   static Command _currentCommand;
-  Shell::_lastBackgroundPid;
-  Shell::_lastArg;
+  static int _lastStatus;
+  static int _lastBackgroundPid;
+  static std::string _lastArg;
 };
 
 #endif
