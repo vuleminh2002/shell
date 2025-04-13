@@ -14,7 +14,7 @@ int yyparse(void);
 int Shell::_lastStatus = 0;
 int Shell::_lastBackgroundPid = -1;
 std::string Shell::_lastArg = "";
-std::string expandAllEnv(const std::string &input);
+static std::string expandAllEnv(const std::string &input);
 static std::string lookupVar(const std::string &varName);
 //function to handle signal interupt ctr+c
 extern "C" void ctrlC(int sig) {
