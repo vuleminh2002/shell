@@ -233,12 +233,10 @@ source[ \t]+[^ \t\n]+ {
 }
 
 
-[^ \t\n|><][^ \t\n|><]*  {
-    std::string raw(yytext);
-    // Expand environment variables in raw
-    //std::string expanded = expandAllEnv(raw);
-    //yylval.cpp_string = new std::string(expanded);
-    return WORD;
+[^ \|>\t\n][^ \|>\t\n]*  {
+  /* Assume that file names have only alpha chars */
+  yylval.cpp_string = new std::string(yytext);
+  return WORD;
 }
 
 .  {
