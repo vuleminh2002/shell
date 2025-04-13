@@ -232,7 +232,6 @@ source[ \t]+[^ \t\n]+ {
   }
 }
 
-[ \t\n]+  { /* do nothing */ }
 
 [^ \t\n|><][^ \t\n|><]*  {
     std::string raw(yytext);
