@@ -217,21 +217,18 @@ source[ \t]+[^ \t\n]+ {
     close(tempin);
     close(tempout);
 
-    // Read from pout[0]
     char buffer[4096] = {0};
     int n = read(pipeOut[0], buffer, sizeof(buffer));
-    //fprintf(stderr, "Subshell output inserted: [%s]\n", buffer);
     close(pipeOut[0]);
 
     // Push the output back into the lexer input buffer
     for (int i = n - 1; i >= 0; --i) {
-      if (buffer[i] == '\n') {
-        //fprintf(stderr, "Subshell output inserted: %c\n", buffer[i]);
-        buffer[i] = '\t';  // Avoid newlines breaking parsing
+      char c = buffer[i];
+      if (c == '\n' || c == '\r') {
+        c = ' ';  // convert newline to space to separate tokens
       }
-      myunputc(buffer[i]);
+      myunputc(c);
     }
-  }
 }
 
 [ \t\n]+  { /* do nothing */ }
