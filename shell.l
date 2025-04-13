@@ -24,7 +24,10 @@ typedef struct yy_buffer_state *YY_BUFFER_STATE;
 extern YY_BUFFER_STATE yy_create_buffer(FILE *, int);
 extern void yy_switch_to_buffer(YY_BUFFER_STATE);
 extern void yy_delete_buffer(YY_BUFFER_STATE);
+
+std::stack<YY_BUFFER_STATE> bufferStack;
 static std::string expandAllEnv(const std::string &input);
+
 static  void yyunput (int c,char *buf_ptr  );
 
 void myunputc(int c) {
