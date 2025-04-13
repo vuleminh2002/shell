@@ -58,9 +58,6 @@ static std::string expandAllEnv(const std::string &input) {
     // Pattern A: ${var}
     std::regex curlyPattern("\\$\\{([^}]+)\\}");
 
-    // Pattern B: $VAR  (alphabetic, digit, _, or !, ?)
-    std::regex noBracePattern("\\$([A-Za-z0-9_?!]+)");
-
     bool changed = true;
     while (changed) {
         changed = false;
@@ -79,17 +76,6 @@ static std::string expandAllEnv(const std::string &input) {
             }
         }
 
-        // 2) Expand no-braces: $VAR
-        {
-            std::smatch match;
-            if (std::regex_search(result, match, noBracePattern)) {
-                std::string varName = match[1].str();
-                std::string expansion = lookupVar(varName);
-
-                result.replace(match.position(0), match.length(0), expansion);
-                changed = true;
-            }
-        }
     }
 
     return result;
