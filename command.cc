@@ -323,7 +323,8 @@ void Command::execute() {
     // 7) If not background, wait for last command
 
     if (!_background) {
-        waitpid(lastPid, nullptr, 0);
+        int status;
+        waitpid(lastPid, &status, 0);
         Shell::_lastStatus = WEXITSTATUS(status);
     }
     else{
