@@ -151,15 +151,19 @@ char * read_line() {
       // Left arrow: ESC [ D => 27,91,68
       if (ch1 == 91 && ch2 == 68) {
         if (cursor_position > 0) {
+          // Move cursor back
+          ch = 8;
+          write(1, &ch, 1);
           cursor_position--;
-          refreshLine();
         }
       }
      
       else if (ch1 == 91 && ch2 == 67) {
         if (cursor_position < line_length) {
+          // Move cursor forward
+          ch = line_buffer[cursor_position];
+          write(1, &ch, 1);
           cursor_position++;
-          refreshLine();
         }
       }
       if (ch1==91 && ch2==65) {
