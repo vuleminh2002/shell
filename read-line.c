@@ -51,7 +51,7 @@ char * read_line() {
   tty_raw_mode();
 
   line_length = 0;
-  cursor_position = 0
+  cursor_position = 0;
   // Read one line until enter is typed
   while (1) {
 
