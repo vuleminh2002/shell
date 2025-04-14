@@ -50,46 +50,32 @@ void add_to_history(const char* line) {
   // Function to clear the current line and display a history entry
 void show_history_entry(int index) {
   char ch;
-  int i;
-  
-  // Erase current line - move to beginning
-  ch = 13; // Carriage return
-  write(1, &ch, 1);
-  
-  // Print spaces to erase the line
-  for (i = 0; i < line_length + 1; i++) {
-      ch = ' ';
-      write(1, &ch, 1);
-  }
-  
-  // Move to beginning again
-  ch = 13;
-  write(1, &ch, 1);
-  
-  // Get history entry
-  char* hist_entry = history[index];
-  
-  // Copy to line buffer
-  strcpy(line_buffer, hist_entry);
-  line_length = strlen(line_buffer);
-  cursor_position = line_length;
-  
-  // Echo the history line
-  write(1, line_buffer, line_length);
-
-
-  
-  // Allocate memory and copy the command (without newline and null terminator)
-  int len = strlen(line);
-  if (line[len-1] == '\n') len--; // Don't include newline in history
-  
-  history[history_position] = (char*)malloc(len + 1);
-  strncpy(history[history_position], line, len);
-  history[history_position][len] = '\0';
-  
-  // Update position for next history item
-  history_position = (history_position + 1) % MAX_HISTORY;
-  history_index = history_position; // Reset index for navigation
+    int i;
+    
+    // Erase current line - move to beginning
+    ch = 13; // Carriage return
+    write(1, &ch, 1);
+    
+    // Print spaces to erase the line
+    for (i = 0; i < line_length + 1; i++) {
+        ch = ' ';
+        write(1, &ch, 1);
+    }
+    
+    // Move to beginning again
+    ch = 13;
+    write(1, &ch, 1);
+    
+    // Get history entry
+    char* hist_entry = history[index];
+    
+    // Copy to line buffer
+    strcpy(line_buffer, hist_entry);
+    line_length = strlen(line_buffer);
+    cursor_position = line_length;
+    
+    // Echo the history line
+    write(1, line_buffer, line_length);
 }
 
 
