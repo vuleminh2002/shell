@@ -1557,6 +1557,7 @@ void expandWildCards(const std::string &prefix, const std::string &suffix)
                 // Normal case
                 newPrefix = prefix + "/" + std::string(entry->d_name);
             }
+            expandWildCards(newPrefix, rest);
         }
     }
     regfree(&re);
