@@ -7,6 +7,7 @@
  */
 
 %{
+#include <pwd.h>
 #include <cstdio>
 #include <cstring>
 #include <string>
