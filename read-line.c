@@ -196,31 +196,31 @@ char * read_line() {
 
 	// Erase old line
 	// Print backspaces
-	int i = 0;
-	for (i =0; i < line_length; i++) {
-	  ch = 8;
-	  write(1,&ch,1);
-	}
-
-	// Print spaces on top
-	for (i =0; i < line_length; i++) {
-	  ch = ' ';
-	  write(1,&ch,1);
-	}
-
-	// Print backspaces
-	for (i =0; i < line_length; i++) {
-	  ch = 8;
-	  write(1,&ch,1);
-	}	
-
-	// Copy line from history
-	strcpy(line_buffer, history[history_index]);
-	line_length = strlen(line_buffer);
-	history_index=(history_index+1)%history_length;
-
-	// echo line
-	write(1, line_buffer, line_length);
+	// Up arrow. Print next line in history.
+          
+          // Erase old line - move to beginning
+          ch = 13; // Carriage return
+          write(1, &ch, 1);
+          
+          // Print spaces
+          int i;
+          for (i = 0; i < line_length + 1; i++) {
+            ch = ' ';
+            write(1, &ch, 1);
+          }
+          
+          // Move to beginning again
+          ch = 13;
+          write(1, &ch, 1);
+          
+          // Copy line from history
+          strcpy(line_buffer, history[history_index]);
+          line_length = strlen(line_buffer);
+          cursor_position = line_length; // Move cursor to end
+          history_index = (history_index + 1) % history_length;
+          
+          // echo line
+          write(1, line_buffer, line_length);
       }
       
     }
