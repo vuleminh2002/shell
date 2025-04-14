@@ -21,7 +21,75 @@ int cursor_position;
 // Simple history array
 // This history does not change. 
 // Yours have to be updated.
+char* history[MAX_HISTORY];      // Array of pointers to history strings
+int history_length = 0;
+int history_position = 0;  
 int history_index = 0;
+
+// Temporary buffer to store the current line when navigating history
+char temp_buffer[MAX_BUFFER_LINE];
+int temp_length = 0;
+int in_history = 0;   
+
+void add_to_history(const char* line) {
+  // Don't add empty lines or duplicates of the last command
+  if (line[0] == '\n' || (history_length > 0 && strcmp(line, history[(history_position + MAX_HISTORY - 1) % MAX_HISTORY]) == 0)) {
+      return;
+  }
+
+  // If we've reached max history entries, free the oldest one
+  if (history_length == MAX_HISTORY) {
+      free(history[history_position]);
+  } else {
+      history_length++;
+  }
+
+
+  // Function to clear the current line and display a history entry
+void show_history_entry(int index) {
+  char ch;
+  int i;
+  
+  // Erase current line - move to beginning
+  ch = 13; // Carriage return
+  write(1, &ch, 1);
+  
+  // Print spaces to erase the line
+  for (i = 0; i < line_length + 1; i++) {
+      ch = ' ';
+      write(1, &ch, 1);
+  }
+  
+  // Move to beginning again
+  ch = 13;
+  write(1, &ch, 1);
+  
+  // Get history entry
+  char* hist_entry = history[index];
+  
+  // Copy to line buffer
+  strcpy(line_buffer, hist_entry);
+  line_length = strlen(line_buffer);
+  cursor_position = line_length;
+  
+  // Echo the history line
+  write(1, line_buffer, line_length);
+}
+
+  
+  // Allocate memory and copy the command (without newline and null terminator)
+  int len = strlen(line);
+  if (line[len-1] == '\n') len--; // Don't include newline in history
+  
+  history[history_position] = (char*)malloc(len + 1);
+  strncpy(history[history_position], line, len);
+  history[history_position][len] = '\0';
+  
+  // Update position for next history item
+  history_position = (history_position + 1) % MAX_HISTORY;
+  history_index = history_position; // Reset index for navigation
+}
+
 char * history [] = {
   "ls -al | grep x", 
   "ps -e",
@@ -75,6 +143,14 @@ char * read_line() {
   //clear buffer
   memset(line_buffer, 0, MAX_BUFFER_LINE);
 
+  // Reset history navigation
+  if (history_length > 0) {
+    history_index = history_position;
+  }
+
+  in_history = 0;
+  temp_length = 0;
+
   // Read one line until enter is typed
   while (1) {
 
@@ -88,6 +164,11 @@ char * read_line() {
       // If max number of character reached return.
       if (line_length == MAX_BUFFER_LINE-2) continue;
       
+      // If we were navigating history, we're now making changes
+      if (in_history) {
+        in_history = 0;
+    }
+
       // If cursor is at the end of line, just add char
       if (cursor_position == line_length) {
         // Do echo
@@ -120,7 +201,11 @@ char * read_line() {
       
       // Print newline
       write(1,&ch,1);
-
+      if (line_length > 0) {
+        // Add null termination temporarily for add_to_history
+        line_buffer[line_length] = '\0';
+        add_to_history(line_buffer);
+      }
       break;
     }
     else if (ch == 31) {
@@ -132,6 +217,10 @@ char * read_line() {
     else if (ch == 8) {
       // <backspace> was typed. Remove previous character read.
       if (cursor_position > 0) {
+
+        if (in_history) {
+          in_history = 0;
+        }
         // Move content after cursor one position left
         memmove(&line_buffer[cursor_position - 1], 
                 &line_buffer[cursor_position], 
@@ -151,6 +240,10 @@ char * read_line() {
     else if (ch == 4) {
       // ctrl-D (Delete key)
       if (cursor_position < line_length) {
+
+        if (in_history) {
+          in_history = 0;
+        }
         // Move content after cursor one position left
         memmove(&line_buffer[cursor_position], 
                 &line_buffer[cursor_position + 1], 
@@ -212,38 +305,75 @@ char * read_line() {
         }
       }
       if (ch1==91 && ch2==65) {
-	// Up arrow. Print next line in history.
+          // Up arrow - show previous command in history
+          if (history_length == 0) {
+            continue; // No history available
+          }
 
-	// Erase old line
-	// Print backspaces
-	int i = 0;
-	for (i =0; i < line_length; i++) {
-	  ch = 8;
-	  write(1,&ch,1);
-	}
+          // Save current line in temp buffer if we're not already in history mode
+          if (!in_history) {
+              memcpy(temp_buffer, line_buffer, line_length);
+              temp_buffer[line_length] = '\0';
+              temp_length = line_length;
+              in_history = 1;
+          }
 
-	// Print spaces on top
-	for (i =0; i < line_length; i++) {
-	  ch = ' ';
-	  write(1,&ch,1);
-	}
+          // Calculate previous history index
+          int prev_index = (history_index + MAX_HISTORY - 1) % MAX_HISTORY;
 
-	// Print backspaces
-	for (i =0; i < line_length; i++) {
-	  ch = 8;
-	  write(1,&ch,1);
-	}	
-
-	// Copy line from history
-	strcpy(line_buffer, history[history_index]);
-	line_length = strlen(line_buffer);
-	history_index=(history_index+1)%history_length;
-  cursor_position = line_length;
-
-	// echo line
-	write(1, line_buffer, line_length);
+          // Only navigate if there's history and we're not at the oldest entry
+          if (history_length > 0 && (prev_index != ((history_position + MAX_HISTORY - history_length) % MAX_HISTORY) || 
+                                    history_index == history_position)) {
+              // Update history index
+              history_index = prev_index;
+              
+              // Show the history entry
+              show_history_entry(history_index);
+          }
+      
+    }
+    else if (ch1== 91 && ch2==66) {
+        // Down arrow - show next command in history
+        if (!in_history) {
+          continue; // Not navigating history
       }
       
+      // Calculate next history index
+      int next_index = (history_index + 1) % MAX_HISTORY;
+      
+      // Check if we've reached current position in history
+      if (next_index == history_position) {
+          // Restore original line
+          // Erase current line
+          ch = 13; // Carriage return
+          write(1, &ch, 1);
+          
+          // Print spaces to erase the line
+          int i;
+          for (i = 0; i < line_length + 1; i++) {
+              ch = ' ';
+              write(1, &ch, 1);
+          }
+          
+          // Move to beginning again
+          ch = 13;
+          write(1, &ch, 1);
+          
+          // Restore temp buffer
+          memcpy(line_buffer, temp_buffer, temp_length);
+          line_length = temp_length;
+          cursor_position = line_length;
+          
+          // Echo line
+          write(1, line_buffer, line_length);
+          
+          in_history = 0;
+      } else {
+          // Show next history entry
+          history_index = next_index;
+          show_history_entry(history_index);
+      }
+
     }
 
   }
