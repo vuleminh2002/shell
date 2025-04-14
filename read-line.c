@@ -308,70 +308,75 @@ char * read_line() {
           // Up arrow - show previous command in history
           if (history_length == 0) {
             continue; // No history available
-          }
-
-          // Save current line in temp buffer if we're not already in history mode
+        }
+        
+        // Save current line in temp buffer if we're not already in history mode
+        if (!in_history) {
+            memcpy(temp_buffer, line_buffer, line_length);
+            temp_buffer[line_length] = '\0';
+            temp_length = line_length;
+            in_history = 1;
+        }
+        
+        // Calculate previous history index
+        int prev_index = (history_index + MAX_HISTORY - 1) % MAX_HISTORY;
+        
+        // Only navigate if there's history and we're not at the oldest entry
+        if (history_length > 0 && (prev_index != ((history_position + MAX_HISTORY - history_length) % MAX_HISTORY) || 
+                                   history_index == history_position)) {
+            // Update history index
+            history_index = prev_index;
+            
+            // Show the history entry
+            show_history_entry(history_index);
+        }
+      }
+      else if (ch1==91 && ch2==66) {
+        // Down arrow - show next command in history
           if (!in_history) {
-              memcpy(temp_buffer, line_buffer, line_length);
-              temp_buffer[line_length] = '\0';
-              temp_length = line_length;
-              in_history = 1;
-          }
-
-          // Calculate previous history index
-          int prev_index = (history_index + MAX_HISTORY - 1) % MAX_HISTORY;
-
-          // Only navigate if there's history and we're not at the oldest entry
-          if (history_length > 0 && (prev_index != ((history_position + MAX_HISTORY - history_length) % MAX_HISTORY) || 
-                                    history_index == history_position)) {
-              // Update history index
-              history_index = prev_index;
-              
-              // Show the history entry
-              show_history_entry(history_index);
-          }
-      
-    }
-    else if (ch1== 91 && ch2==66) {
-        // Left arrow
-        if (cursor_position > 0) {
-          // Move cursor back
-          ch = 8;
-          write(1, &ch, 1);
-          cursor_position--;
+            continue; // Not navigating history
+        }
+        
+        // Calculate next history index
+        int next_index = (history_index + 1) % MAX_HISTORY;
+        
+        // Check if we've reached current position in history
+        if (next_index == history_position) {
+            // Restore original line
+            // Erase current line
+            ch = 13; // Carriage return
+            write(1, &ch, 1);
+            
+            // Print spaces to erase the line
+            int i;
+            for (i = 0; i < line_length + 1; i++) {
+                ch = ' ';
+                write(1, &ch, 1);
+            }
+            
+            // Move to beginning again
+            ch = 13;
+            write(1, &ch, 1);
+            
+            // Restore temp buffer
+            memcpy(line_buffer, temp_buffer, temp_length);
+            line_length = temp_length;
+            cursor_position = line_length;
+            
+            // Echo line
+            write(1, line_buffer, line_length);
+            
+            in_history = 0;
+        } else {
+            // Show next history entry
+            history_index = next_index;
+            show_history_entry(history_index);
+        }
+        
       }
-  }
-  else if (ch2 == 67) {
-      // Right arrow
-      if (cursor_position < line_length) {
-          // Move cursor forward
-          ch = line_buffer[cursor_position];
-          write(1, &ch, 1);
-          cursor_position++;
-      }
-  }
-  else if (ch2 == 72) {
-      // Home key (some terminals)
-      while (cursor_position > 0) {
-          // Move cursor back
-          ch = 8;
-          write(1, &ch, 1);
-          cursor_position--;
-      }
-  }
-  else if (ch2 == 70) {
-      // End key (some terminals)
-      while (cursor_position < line_length) {
-          // Output character at current position
-          ch = line_buffer[cursor_position];
-          write(1, &ch, 1);
-          cursor_position++;
-      }
-  }
     }
 
   }
-}
 
   // Add eol and null char at the end of string
   line_buffer[line_length]=10;
