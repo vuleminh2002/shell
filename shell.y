@@ -255,79 +255,66 @@ static char *wildcardToRegex(const char *arg) {
 // The actual expansion function. For Part 1, we ignore 'prefix' (if any)
 void expandWildCards(char *prefix, char *suffix)
 {
-    // 1) Convert 'suffix' to a regex
-    char *regstr = wildcardToRegex(suffix);
-
-    // Compile
-    regex_t re;
-    int ret = regcomp(&re, regstr, REG_EXTENDED | REG_NOSUB);
-    free(regstr);
-    if (ret != 0) {
-        // If compile fails, fallback
-        return; 
-    }
-
-    // 2) Open current directory
-    DIR *dir = opendir(".");
-    if (!dir) {
-        perror("opendir");
-        regfree(&re);
+    if (suffix.empty()) {
+        if (nEntries == maxEntries) {
+            maxEntries *= 2;
+            entries = (char**)realloc(entries, maxEntries * sizeof(char*));
+            assert(entries);
+        }
+        entries[nEntries++] = strdup(prefix.c_str());
         return;
     }
 
-    // 3) readdir + regexec
-    struct dirent *entry;
-    while ((entry = readdir(dir)) != NULL) {
-      
-        if (entry->d_name[0] == '.' && suffix[0] != '.') {
-        continue;
-    }
+    size_t slashPos = suffix.find('/');
+    std::string component = (slashPos == std::string::npos) ? suffix : suffix.substr(0, slashPos);
+    std::string rest = (slashPos == std::string::npos) ? "" : suffix.substr(slashPos + 1);
 
+    std::string dir = prefix.empty() ? "." : prefix;
+    DIR *dp = opendir(dir.c_str());
+    if (!dp) return;
+
+    regex_t re;
+    char *regexStr = wildcardToRegex(component.c_str());
+    if (regcomp(&re, regexStr, REG_EXTENDED | REG_NOSUB) != 0) {
+        free(regexStr);
+        closedir(dp);
+        return;
+    }
+    free(regexStr);
+
+    struct dirent *entry;
+    while ((entry = readdir(dp)) != NULL) {
+        if (entry->d_name[0] == '.' && component[0] != '.') continue;
         if (regexec(&re, entry->d_name, 0, NULL, 0) == 0) {
-            // match
-            // store into 'entries' array
-            if (nEntries == maxEntries) {
-                maxEntries *= 2;
-                entries = (char**)realloc(entries, maxEntries * sizeof(char*));
-                assert(entries);
-            }
-            entries[nEntries] = strdup(entry->d_name); 
-            nEntries++;
+            std::string newPrefix = prefix.empty() ? entry->d_name : prefix + "/" + entry->d_name;
+            expandWildCards(newPrefix, rest);
         }
     }
-    closedir(dir);
     regfree(&re);
+    closedir(dp);
 }
 
 // The user-facing function
 void expandWildCardsIfNecessary(char *arg) {
-    // Initialize / reset global array 
+   nEntries = 0;
     maxEntries = 20;
-    nEntries = 0;
     entries = (char**)malloc(maxEntries * sizeof(char*));
 
-    if (strchr(arg, '*') || strchr(arg, '?')) {
-        // Has wildcard => expand
-        expandWildCards(NULL, arg);
+    std::string path(arg);
+    if (path.find('*') != std::string::npos || path.find('?') != std::string::npos) {
+        if (path[0] == '/') expandWildCards("/", path.substr(1));
+        else expandWildCards("", path);
 
-        if (nEntries == 0) {
-            // No matches => fallback to literal
-            Command::_currentSimpleCommand->insertArgument(new std::string(arg));
-        } else {
-            // sort
-            qsort(entries, nEntries, sizeof(char*), cmpfunc);
+        qsort(entries, nEntries, sizeof(char*), cmpfunc);
 
-            // insert each
-            for (int i = 0; i < nEntries; i++) {
-                Command::_currentSimpleCommand->insertArgument(new std::string(entries[i]));
-                free(entries[i]); // if strdup was used earlier
-            }
+        for (int i = 0; i < nEntries; ++i) {
+            Command::_currentSimpleCommand->insertArgument(new std::string(entries[i]));
+            free(entries[i]);
         }
-        free(entries);
     } else {
-        // no wildcard => just insert directly
         Command::_currentSimpleCommand->insertArgument(new std::string(arg));
     }
+    free(entries);
 }
 
 
