@@ -148,6 +148,20 @@ char * read_line() {
         refresh_display(cursor_position, line_length);
       }
     }
+    else if (ch == 4) {
+      // ctrl-D (Delete key)
+      if (cursor_position < line_length) {
+        // Move content after cursor one position left
+        memmove(&line_buffer[cursor_position], 
+                &line_buffer[cursor_position + 1], 
+                line_length - cursor_position - 1);
+        
+        line_length--;
+        
+        // Reprint the line from current position
+        refresh_display(cursor_position, line_length);
+      }
+    }
     else if (ch==27) {
       // Escape sequence. Read two chars more
       //
