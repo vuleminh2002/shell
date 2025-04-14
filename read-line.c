@@ -42,6 +42,26 @@ void read_line_print_usage()
   write(1, usage, strlen(usage));
 }
 
+void refresh_display(int pos, int len) {
+  int i;
+  char ch;
+  
+  // Save the current cursor position
+  write(1, "\033[s", 3);
+  
+  // Write the portion of the buffer from cursor to end
+  if (pos < len) {
+    write(1, &line_buffer[pos], len - pos);
+  }
+  
+  // Write a space at the end (to erase any potential leftover character)
+  ch = ' ';
+  write(1, &ch, 1);
+  
+  // Restore cursor position
+  write(1, "\033[u", 3);
+}
+
 /* 
  * Input a line with some basic editing.
  */
@@ -52,6 +72,8 @@ char * read_line() {
 
   line_length = 0;
   cursor_position = 0;
+
+  memset(line_buffer, 0, MAX_BUFFER_LINE);
   // Read one line until enter is typed
   while (1) {
 
@@ -59,18 +81,38 @@ char * read_line() {
     char ch;
     read(0, &ch, 1);
 
-    if (ch>=32) {
-      // It is a printable character. 
-
-      // Do echo
-      write(1,&ch,1);
-
+    if (ch >= 32) {
+      // It is a printable character.
+      
       // If max number of character reached return.
-      if (line_length==MAX_BUFFER_LINE-2) break; 
-
-      // add char to buffer.
-      line_buffer[line_length]=ch;
-      line_length++;
+      if (line_length == MAX_BUFFER_LINE-2) continue;
+      
+      // If cursor is at the end of line, just add char
+      if (cursor_position == line_length) {
+        // Do echo
+        write(1, &ch, 1);
+        
+        // Add char to buffer
+        line_buffer[cursor_position] = ch;
+        cursor_position++;
+        line_length++;
+      } 
+      else {
+        // Inserting in the middle of the line
+        // First, make space by shifting characters
+        memmove(&line_buffer[cursor_position + 1], 
+                &line_buffer[cursor_position], 
+                line_length - cursor_position);
+        
+        // Insert the character
+        line_buffer[cursor_position] = ch;
+        cursor_position++;
+        line_length++;
+        
+        // Reprint the line from current position
+        write(1, &ch, 1); // Print the character just inserted
+        refresh_display(cursor_position, line_length);
+      }
     }
     else if (ch==10) {
       // <Enter> was typed. Return line
@@ -83,27 +125,66 @@ char * read_line() {
     else if (ch == 31) {
       // ctrl-?
       read_line_print_usage();
-      line_buffer[0]=0;
+      line_buffer[0] = 0;
+      line_length = 0;
+      cursor_position = 0;
       break;
     }
     else if (ch == 8) {
       // <backspace> was typed. Remove previous character read.
-
-      // Go back one character
-      ch = 8;
-      write(1,&ch,1);
-
-      // Write a space to erase the last character read
-      ch = ' ';
-      write(1,&ch,1);
-
-      // Go back one character
-      ch = 8;
-      write(1,&ch,1);
-
-      // Remove one character from buffer
-      line_length--;
+      if (cursor_position > 0) {
+        // Move content after cursor one position left
+        memmove(&line_buffer[cursor_position - 1], 
+                &line_buffer[cursor_position], 
+                line_length - cursor_position);
+        
+        cursor_position--;
+        line_length--;
+        
+        // Move cursor back
+        ch = 8;
+        write(1, &ch, 1);
+        
+        // Reprint the line from current position
+        refresh_display(cursor_position, line_length);
+      }
     }
+
+    else if (ch == 4) {
+      // ctrl-D (Delete key)
+      if (cursor_position < line_length) {
+        // Move content after cursor one position left
+        memmove(&line_buffer[cursor_position], 
+                &line_buffer[cursor_position + 1], 
+                line_length - cursor_position - 1);
+        
+        line_length--;
+        
+        // Reprint the line from current position
+        refresh_display(cursor_position, line_length);
+      }
+    }
+
+    else if (ch == 1) {
+      // ctrl-A (Home key)
+      while (cursor_position > 0) {
+        // Move cursor back
+        ch = 8;
+        write(1, &ch, 1);
+        cursor_position--;
+      }
+    }
+    else if (ch == 5) {
+      // ctrl-E (End key)
+      // Move cursor to end of line
+      while (cursor_position < line_length) {
+        // Output character at current position
+        ch = line_buffer[cursor_position];
+        write(1, &ch, 1);
+        cursor_position++;
+      }
+    }
+
     else if (ch==27) {
       // Escape sequence. Read two chars more
       //
@@ -116,16 +197,22 @@ char * read_line() {
       read(0, &ch2, 1);
 
       if (ch1 == 91 && ch2 == 68) {
-        if (cursor_position > 0) {
-          cursor_position--;
-          refreshLine();
-        }
+        // Left arrow
+          if (cursor_position > 0) {
+            // Move cursor back
+            ch = 8;
+            write(1, &ch, 1);
+            cursor_position--;
+          }
       }
        // Right arrow: ESC [ C => 27,91,67
       else if (ch1 == 91 && ch2 == 67) {
+        // Right arrow
         if (cursor_position < line_length) {
+          // Move cursor forward
+          ch = line_buffer[cursor_position];
+          write(1, &ch, 1);
           cursor_position++;
-          refreshLine();
         }
       }
       if (ch1==91 && ch2==65) {
@@ -168,39 +255,5 @@ char * read_line() {
   return line_buffer;
 }
 
-//helper funtion to display the new state.
-void refreshLine() {
-  // 1) Go left from current position to the start
-  // (line_length or cursor_position times).
-  // We can do that by printing backspace (char=8) enough times
-  int i;
-  // Move left from current cursor to 0
-  for (i = 0; i < cursor_position; i++) {
-      char ch = 8;
-      write(1, &ch, 1);
-  }
-  
-  // 2) Print spaces to clear the line
-  for (i = 0; i < line_length; i++) {
-      char ch = ' ';
-      write(1, &ch, 1);
-  }
 
-  // 3) Move back again
-  for (i = 0; i < line_length; i++) {
-      char ch = 8;
-      write(1, &ch, 1);
-  }
-
-  // 4) Print the buffer
-  write(1, line_buffer, line_length);
-
-  // 5) Now move the cursor from end -> cursor_position
-  int distance = line_length - cursor_position;
-  while (distance > 0) {
-      char ch = 8; 
-      write(1, &ch, 1);
-      distance--;
-  }
-}
 
