@@ -17,7 +17,7 @@ extern void tty_raw_mode(void);
 // Buffer where line is stored
 int line_length;
 char line_buffer[MAX_BUFFER_LINE];
-
+int cursor_position; 
 // Simple history array
 // This history does not change. 
 // Yours have to be updated.
@@ -51,7 +51,7 @@ char * read_line() {
   tty_raw_mode();
 
   line_length = 0;
-
+  cursor_position = 0
   // Read one line until enter is typed
   while (1) {
 
@@ -114,6 +114,26 @@ char * read_line() {
       char ch2;
       read(0, &ch1, 1);
       read(0, &ch2, 1);
+
+      if (ch1 == 91 && ch2 == 68) {
+        // Move cursor left
+        if (cursor_position > 0) {
+            cursor_position--;
+            // Move physically left one char
+            char back = 8; 
+            write(1, &back, 1);
+        }
+    }
+    // Right arrow: ESC [ C => 27, 91, 67
+    else if (ch1 == 91 && ch2 == 67) {
+        // Move cursor right
+        if (cursor_position < line_length) {
+            // Move physically right one char
+            char c = line_buffer[cursor_position];
+            write(1, &c, 1);
+            cursor_position++;
+        }
+    }
       if (ch1==91 && ch2==65) {
 	// Up arrow. Print next line in history.
 
@@ -156,5 +176,41 @@ char * read_line() {
   line_buffer[line_length]=0;
 
   return line_buffer;
+}
+
+//helper funtion to display the new state.
+void refreshLine() {
+  // 1) Go left from current position to the start
+  // (line_length or cursor_position times).
+  // We can do that by printing backspace (char=8) enough times
+  int i;
+  // Move left from current cursor to 0
+  for (i = 0; i < cursor_position; i++) {
+      char ch = 8;
+      write(1, &ch, 1);
+  }
+  
+  // 2) Print spaces to clear the line
+  for (i = 0; i < line_length; i++) {
+      char ch = ' ';
+      write(1, &ch, 1);
+  }
+
+  // 3) Move back again
+  for (i = 0; i < line_length; i++) {
+      char ch = 8;
+      write(1, &ch, 1);
+  }
+
+  // 4) Print the buffer
+  write(1, line_buffer, line_length);
+
+  // 5) Now move the cursor from end -> cursor_position
+  int distance = line_length - cursor_position;
+  while (distance > 0) {
+      char ch = 8; 
+      write(1, &ch, 1);
+      distance--;
+  }
 }
 
