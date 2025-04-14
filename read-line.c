@@ -116,25 +116,19 @@ char * read_line() {
       read(0, &ch2, 1);
 
       if (ch1 == 91 && ch2 == 68) {
-        // Move cursor left
         if (cursor_position > 0) {
           cursor_position--;
-          // Move left
-          write(1, "\033[D", 3);
+          refreshLine();
+        }
       }
-    }
-    // Right arrow: ESC [ C => 27, 91, 67
-    else if (ch1 == 91 && ch2 == 67) {
-      if (cursor_position < line_length) {
-        cursor_position++;
-        // Either: 
-        // 1) visually move cursor with an ANSI code
-        write(1, "\033[C", 3);
-        // 2) Or do full re-draw:
-        // refreshLine();
-    }
-    }
-      if (ch1==91 && ch2==65) {
+       // Right arrow: ESC [ C => 27,91,67
+      else if (ch1 == 91 && ch2 == 67) {
+        if (cursor_position < line_length) {
+          cursor_position++;
+          refreshLine();
+        }
+      }
+      else if (ch1==91 && ch2==65) {
 	// Up arrow. Print next line in history.
 
 	// Erase old line
