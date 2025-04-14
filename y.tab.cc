@@ -1513,7 +1513,7 @@ static char *wildcardToRegex(const char *arg) {
 }
 
 // The actual expansion function. For Part 1, we ignore 'prefix' (if any)
-void expandWildCards(char *prefix, char *suffix)
+void expandWildCards(const std::string &prefix, const std::string &suffix)
 {
     if (suffix.empty()) {
         if (nEntries == maxEntries) {

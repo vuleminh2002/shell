@@ -286,8 +286,17 @@ void expandWildCards(const std::string &prefix, const std::string &suffix)
     while ((entry = readdir(dp)) != NULL) {
         if (entry->d_name[0] == '.' && component[0] != '.') continue;
         if (regexec(&re, entry->d_name, 0, NULL, 0) == 0) {
-            std::string newPrefix = prefix.empty() ? entry->d_name : prefix + "/" + entry->d_name;
-            expandWildCards(newPrefix, rest);
+            std::string newPrefix;
+            if (prefix == "/") {
+                // There's already a trailing slash
+                newPrefix = "/" + std::string(entry->d_name);
+            } else if (prefix.empty()) {
+                // No prefix, so do not add slash
+                newPrefix = entry->d_name;
+            } else {
+                // Normal case
+                newPrefix = prefix + "/" + std::string(entry->d_name);
+            }
         }
     }
     regfree(&re);
