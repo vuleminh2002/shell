@@ -79,7 +79,65 @@ void myunputc(int c) {
   return GREAT2;
 }
 
+^"~"([^/\t\n ]+)?(/[^\t\n ]*)? {
+    /*
+      Explanation of pattern:
+      - ^"~": token starts with tilde
+      - ([^/\t\n ]+)? optionally matches a username (e.g. ~bob)
+      - (/[^\t\n ]*)? optionally matches a subpath (e.g. /documents)
+    */
+    std::string text(yytext); // e.g. "~bob/docs"
 
+    // We'll parse out the optional user and path
+    // There's a tilde, then optionally a user, then optionally a path.
+    // Let’s break it down manually:
+
+    // 1) Skip the tilde itself
+    std::string rest = text.substr(1);   // e.g. "bob/docs"
+
+    std::string user, subpath;
+    // 2) Check if there's a slash
+    size_t slashPos = rest.find('/');
+    if (slashPos == 0) {
+        // Means something like "/docs", no user
+        user = "";
+        subpath = rest;   // "/docs"
+    } else if (slashPos == std::string::npos) {
+        // Means no slash => maybe user, maybe empty
+        user = rest;      // e.g. "bob"
+        subpath = "";
+    } else {
+        user = rest.substr(0, slashPos);       // "bob"
+        subpath = rest.substr(slashPos);       // "/docs"
+    }
+
+    // 3) Determine the user’s home directory
+    const char* homeDir = nullptr;
+    if (user.empty()) {
+        // no user means "~" or "~/somewhere"
+        // => get current user’s HOME
+        homeDir = getenv("HOME");
+    } else {
+        // use getpwnam to look up ~bob
+        struct passwd *pw = getpwnam(user.c_str());
+        if (pw) {
+            homeDir = pw->pw_dir;
+        }
+    }
+
+    if (!homeDir) {
+        // fallback => return the token unchanged
+        yylval.cpp_string = new std::string(text);
+        return WORD;
+    }
+
+    // 4) Construct the final expanded path
+    std::string expanded = std::string(homeDir) + subpath;
+
+    // Return as a normal WORD
+    yylval.cpp_string = new std::string(expanded);
+    return WORD;
+}
 
 source[ \t]+[^ \t\n]+ {
     std::string filename(yytext + 7); // Skip "source "
