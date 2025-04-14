@@ -90,15 +90,6 @@ void show_history_entry(int index) {
   history_index = history_position; // Reset index for navigation
 }
 
-char * history [] = {
-  "ls -al | grep x", 
-  "ps -e",
-  "cat read-line-example.c",
-  "vi hello.c",
-  "make",
-  "ls -al | grep xxx | grep yyy"
-};
- history_length = sizeof(history)/sizeof(char *);
 
 void read_line_print_usage()
 {
