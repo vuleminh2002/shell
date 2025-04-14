@@ -81,17 +81,8 @@ void myunputc(int c) {
 }
 
 ~[^ \n\t]* {
-    /*
-      Explanation of pattern:
-      - ^"~": token starts with tilde
-      - ([^/\t\n ]+)? optionally matches a username (e.g. ~bob)
-      - (/[^\t\n ]*)? optionally matches a subpath (e.g. /documents)
-    */
-    std::string text(yytext); // e.g. "~bob/docs"
-
-    // We'll parse out the optional user and path
-    // There's a tilde, then optionally a user, then optionally a path.
-    // Let’s break it down manually:
+   
+    std::string text(yytext); 
 
     // 1) Skip the tilde itself
     std::string rest = text.substr(1);   // e.g. "bob/docs"
@@ -102,14 +93,15 @@ void myunputc(int c) {
     if (slashPos == 0) {
         // Means something like "/docs", no user
         user = "";
-        subpath = rest;   // "/docs"
+        subpath = rest;  
     } else if (slashPos == std::string::npos) {
-        // Means no slash => maybe user, maybe empty
-        user = rest;      // e.g. "bob"
+        // no slash maybe user, maybe empty
+        user = rest;      
         subpath = "";
     } else {
-        user = rest.substr(0, slashPos);       // "bob"
-        subpath = rest.substr(slashPos);       // "/docs"
+	//both user and subpath
+        user = rest.substr(0, slashPos);
+        subpath = rest.substr(slashPos);
     }
 
     // 3) Determine the user’s home directory
@@ -119,23 +111,20 @@ void myunputc(int c) {
         // => get current user’s HOME
         homeDir = getenv("HOME");
     } else {
-        // use getpwnam to look up ~bob
-        struct passwd *pw = getpwnam(user.c_str());
+           struct passwd *pw = getpwnam(user.c_str());
         if (pw) {
             homeDir = pw->pw_dir;
         }
     }
 
     if (!homeDir) {
-        // fallback => return the token unchanged
-        yylval.cpp_string = new std::string(text);
+           yylval.cpp_string = new std::string(text);
         return WORD;
     }
 
-    // 4) Construct the final expanded path
+   
     std::string expanded = std::string(homeDir) + subpath;
 
-    // Return as a normal WORD
     yylval.cpp_string = new std::string(expanded);
     return WORD;
 }
