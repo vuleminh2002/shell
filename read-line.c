@@ -171,6 +171,17 @@ char * read_line() {
         cursor_position--;
       }
     }
+
+    else if (ch == 5) {
+      // ctrl-E (End key)
+      // Move cursor to end of line
+      while (cursor_position < line_length) {
+        // Output character at current position
+        ch = line_buffer[cursor_position];
+        write(1, &ch, 1);
+        cursor_position++;
+      }
+    }
     else if (ch==27) {
       // Escape sequence. Read two chars more
       //
