@@ -1038,17 +1038,8 @@ case 11:
 YY_RULE_SETUP
 #line 83 "shell.l"
 {
-    /*
-      Explanation of pattern:
-      - ^"~": token starts with tilde
-      - ([^/\t\n ]+)? optionally matches a username (e.g. ~bob)
-      - (/[^\t\n ]*)? optionally matches a subpath (e.g. /documents)
-    */
-    std::string text(yytext); // e.g. "~bob/docs"
-
-    // We'll parse out the optional user and path
-    // There's a tilde, then optionally a user, then optionally a path.
-    // Let’s break it down manually:
+   
+    std::string text(yytext); 
 
     // 1) Skip the tilde itself
     std::string rest = text.substr(1);   // e.g. "bob/docs"
@@ -1059,14 +1050,15 @@ YY_RULE_SETUP
     if (slashPos == 0) {
         // Means something like "/docs", no user
         user = "";
-        subpath = rest;   // "/docs"
+        subpath = rest;  
     } else if (slashPos == std::string::npos) {
-        // Means no slash => maybe user, maybe empty
-        user = rest;      // e.g. "bob"
+        // no slash maybe user, maybe empty
+        user = rest;      
         subpath = "";
     } else {
-        user = rest.substr(0, slashPos);       // "bob"
-        subpath = rest.substr(slashPos);       // "/docs"
+	//both user and subpath
+        user = rest.substr(0, slashPos);
+        subpath = rest.substr(slashPos);
     }
 
     // 3) Determine the user’s home directory
@@ -1076,30 +1068,27 @@ YY_RULE_SETUP
         // => get current user’s HOME
         homeDir = getenv("HOME");
     } else {
-        // use getpwnam to look up ~bob
-        struct passwd *pw = getpwnam(user.c_str());
+           struct passwd *pw = getpwnam(user.c_str());
         if (pw) {
             homeDir = pw->pw_dir;
         }
     }
 
     if (!homeDir) {
-        // fallback => return the token unchanged
-        yylval.cpp_string = new std::string(text);
+           yylval.cpp_string = new std::string(text);
         return WORD;
     }
 
-    // 4) Construct the final expanded path
+   
     std::string expanded = std::string(homeDir) + subpath;
 
-    // Return as a normal WORD
     yylval.cpp_string = new std::string(expanded);
     return WORD;
 }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 143 "shell.l"
+#line 132 "shell.l"
 {
     std::string filename(yytext + 7); // Skip "source "
     FILE *fp = fopen(filename.c_str(), "r");
@@ -1129,7 +1118,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 170 "shell.l"
+#line 159 "shell.l"
 {
   /*matching quote*/
   yylval.cpp_string = new std::string(yytext + 1, yyleng - 2);
@@ -1138,7 +1127,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 176 "shell.l"
+#line 165 "shell.l"
 {
 	/* 2.4: Quotes */
 	
@@ -1151,7 +1140,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 186 "shell.l"
+#line 175 "shell.l"
 {
     /*2.5 escaping */
 
@@ -1196,7 +1185,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 228 "shell.l"
+#line 217 "shell.l"
 {
   /* 2.8 subshell */
   // Strip the outer $(...) or backticks
@@ -1265,7 +1254,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 295 "shell.l"
+#line 284 "shell.l"
 {
   /* Assume that file names have only alpha chars */
   std::string raw(yytext); 
@@ -1276,10 +1265,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 307 "shell.l"
+#line 296 "shell.l"
 ECHO;
 	YY_BREAK
-#line 1283 "lex.yy.cc"
+#line 1272 "lex.yy.cc"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2296,4 +2285,4 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 307 "shell.l"
+#line 296 "shell.l"

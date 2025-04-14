@@ -32,6 +32,7 @@ extern "C" void zombieHandler(int sig){
 	while (waitpid(-1, NULL, WNOHANG) > 0) {};
 	  //printf("[%d] exited.\n", pid);
 }
+//3.1 variable expandsions.
  std::string expandAllEnv(const std::string &input) {
     // We apply expansions in a loop until no more matches found.
     // This ensures multiple expansions in one token are replaced.

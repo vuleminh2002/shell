@@ -38,7 +38,9 @@
 
 void yyerror(const char * s);
 int yylex();
-
+static int cmpfunc(const void *a, const void *b);
+void expandWildCardsIfNecessary(char *arg);
+void expandWildCards(char *prefix, char *suffix);
 %}
 
 %%
@@ -92,10 +94,13 @@ argument_list:
 
 argument:
   WORD {
-    #ifdef PRINTING
-      printf("   Yacc: insert argument \"%s\"\n", $1->c_str());
-    #endif
-    Command::_currentSimpleCommand->insertArgument( $1 );\
+    if(strcmp(Command::_currentSimpleCommand->_arguments[0], "echo") == 0 && strchr($1, '?'))
+      #ifdef PRINTING
+        printf("   Yacc: insert argument \"%s\"\n", $1->c_str());
+      #endif
+      Command::_currentSimpleCommand->insertArgument( $1 );
+    else
+		  expandWildCardsIfNecessary($1);
   }
   ;
 
@@ -201,6 +206,123 @@ iomodifier_opt:
 
 
 %%
+
+// Global or static variables for Part 1
+int maxEntries = 20;
+int nEntries = 0;
+char **entries = NULL;
+
+// A helper compare function for qsort (or you can use C++ std::sort)
+static int cmpfunc(const void *a, const void *b) {
+    char *s1 = *(char**)a;
+    char *s2 = *(char**)b;
+    return strcmp(s1, s2);
+}
+
+// Convert wildcard pattern to a posix regex (e.g. '*.c' -> '^.*\.c$')
+static char *wildcardToRegex(const char *arg) {
+    // Enough space: each char might become 2+ chars in worst case
+    char *reg = (char*)malloc(2*strlen(arg) + 10);
+    char *r = reg;
+    const char *a = arg;
+
+    *r = '^'; r++;  // start anchor
+    while (*a) {
+        if (*a == '*') {
+            *r = '.'; r++;
+            *r = '*'; r++;
+        } else if (*a == '?') {
+            *r = '.'; r++;
+        } else if (*a == '.') {
+            *r = '\\'; r++;
+            *r = '.'; r++;
+        } else {
+            *r = *a; r++;
+        }
+        a++;
+    }
+    *r = '$'; r++;
+    *r = 0;   // null terminate
+    return reg;
+}
+
+// The actual expansion function. For Part 1, we ignore 'prefix' (if any)
+void expandWildCards(char *prefix, char *suffix)
+{
+    // 1) Convert 'suffix' to a regex
+    char *regstr = wildcardToRegex(suffix);
+
+    // Compile
+    regex_t re;
+    int ret = regcomp(&re, regstr, REG_EXTENDED | REG_NOSUB);
+    free(regstr);
+    if (ret != 0) {
+        // If compile fails, fallback
+        return; 
+    }
+
+    // 2) Open current directory
+    DIR *dir = opendir(".");
+    if (!dir) {
+        perror("opendir");
+        regfree(&re);
+        return;
+    }
+
+    // 3) readdir + regexec
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != NULL) {
+        // skip "." and ".." if you want
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+            continue;
+        }
+
+        if (regexec(&re, entry->d_name, 0, NULL, 0) == 0) {
+            // match
+            // store into 'entries' array
+            if (nEntries == maxEntries) {
+                maxEntries *= 2;
+                entries = (char**)realloc(entries, maxEntries * sizeof(char*));
+                assert(entries);
+            }
+            entries[nEntries] = strdup(entry->d_name); 
+            nEntries++;
+        }
+    }
+    closedir(dir);
+    regfree(&re);
+}
+
+// The user-facing function
+void expandWildCardsIfNecessary(char *arg) {
+    // Initialize / reset global array 
+    maxEntries = 20;
+    nEntries = 0;
+    entries = (char**)malloc(maxEntries * sizeof(char*));
+
+    if (strchr(arg, '*') || strchr(arg, '?')) {
+        // Has wildcard => expand
+        expandWildCards(NULL, arg);
+
+        if (nEntries == 0) {
+            // No matches => fallback to literal
+            Command::_currentSimpleCommand->insertArgument(strdup(arg));
+        } else {
+            // sort
+            qsort(entries, nEntries, sizeof(char*), cmpfunc);
+
+            // insert each
+            for (int i = 0; i < nEntries; i++) {
+                Command::_currentSimpleCommand->insertArgument(entries[i]);
+            }
+        }
+        free(entries);
+    } else {
+        // no wildcard => just insert directly
+        Command::_currentSimpleCommand->insertArgument(strdup(arg));
+    }
+}
+
 
 void
 yyerror(const char * s)
