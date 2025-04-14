@@ -98,7 +98,7 @@ char * history [] = {
   "make",
   "ls -al | grep xxx | grep yyy"
 };
-int history_length = sizeof(history)/sizeof(char *);
+ history_length = sizeof(history)/sizeof(char *);
 
 void read_line_print_usage()
 {
