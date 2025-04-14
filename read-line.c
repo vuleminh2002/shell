@@ -162,6 +162,15 @@ char * read_line() {
         refresh_display(cursor_position, line_length);
       }
     }
+    else if (ch == 1) {
+      // ctrl-A (Home key)
+      while (cursor_position > 0) {
+        // Move cursor back
+        ch = 8;
+        write(1, &ch, 1);
+        cursor_position--;
+      }
+    }
     else if (ch==27) {
       // Escape sequence. Read two chars more
       //
