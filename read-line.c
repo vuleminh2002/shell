@@ -120,8 +120,8 @@ char * read_line() {
         if (cursor_position > 0) {
             cursor_position--;
             // Move physically left one char
-            char back = 1; 
-            write(1, &back, 1);
+            char back = 8; 
+            write(1, "\b", 1);
         }
     }
     // Right arrow: ESC [ C => 27, 91, 67
