@@ -117,22 +117,18 @@ char * read_line() {
 
       if (ch1 == 91 && ch2 == 68) {
         // Move cursor left
-        if (cursor_position > 0) {
-            cursor_position--;
-            // Move physically left one char
-            char back = 8; 
-            write(1, "\b", 1);
-        }
+        if (cursor_pos > 0) {
+          cursor_pos--;
+          write(1, "\b", 1);  // Move cursor back visually
+      }
     }
     // Right arrow: ESC [ C => 27, 91, 67
     else if (ch1 == 91 && ch2 == 67) {
         // Move cursor right
-        if (cursor_position < line_length) {
-            // Move physically right one char
-            char c = line_buffer[cursor_position];
-            write(1, &c, 1);
-            cursor_position++;
-        }
+        if (cursor_pos < line_length) {
+          write(1, &line_buffer[cursor_pos], 1); // Show the character to the right
+          cursor_pos++;
+      }      
     }
       if (ch1==91 && ch2==65) {
 	// Up arrow. Print next line in history.
