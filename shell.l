@@ -79,7 +79,7 @@ void myunputc(int c) {
   return GREAT2;
 }
 
-^"~"([^/\t\n ]+)?(/[^\t\n ]*)? {
+^~([^/\t\n ]+)?(/[^\t\n ]*)? {
     /*
       Explanation of pattern:
       - ^"~": token starts with tilde
