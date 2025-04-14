@@ -32,17 +32,29 @@ int temp_length = 0;
 int in_history = 0;   
 
 void add_to_history(const char* line) {
-  // Don't add empty lines or duplicates of the last command
-  if (line[0] == '\n' || (history_length > 0 && strcmp(line, history[(history_position + MAX_HISTORY - 1) % MAX_HISTORY]) == 0)) {
-      return;
-  }
+      // Don't add empty lines or duplicates of the last command
+      if (line[0] == '\n' || (history_length > 0 && strcmp(line, history[(history_position + MAX_HISTORY - 1) % MAX_HISTORY]) == 0)) {
+        return;
+    }
 
-  // If we've reached max history entries, free the oldest one
-  if (history_length == MAX_HISTORY) {
-      free(history[history_position]);
-  } else {
-      history_length++;
-  }
+    // If we've reached max history entries, free the oldest one
+    if (history_length == MAX_HISTORY) {
+        free(history[history_position]);
+    } else {
+        history_length++;
+    }
+
+    // Allocate memory and copy the command (without newline and null terminator)
+    int len = strlen(line);
+    if (line[len-1] == '\n') len--; // Don't include newline in history
+
+    history[history_position] = (char*)malloc(len + 1);
+    strncpy(history[history_position], line, len);
+    history[history_position][len] = '\0';
+
+    // Update position for next history item
+    history_position = (history_position + 1) % MAX_HISTORY;
+    history_index = history_position; // Reset index for navigation
 }
   
 
