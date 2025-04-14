@@ -76,7 +76,7 @@ void show_history_entry(int index) {
   
   // Echo the history line
   write(1, line_buffer, line_length);
-}
+
 
   
   // Allocate memory and copy the command (without newline and null terminator)
