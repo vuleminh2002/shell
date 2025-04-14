@@ -100,13 +100,13 @@ argument_list:
 
 argument:
   WORD {
-    if (strcmp(Command::_currentSimpleCommand->_arguments[0]->c_str(), "echo") == 0 && strchr($1, '?'))
+    if (strcmp(Command::_currentSimpleCommand->_arguments[0]->c_str(), "echo") == 0 && strchr((char *)$1->c_str(), '?'))
       #ifdef PRINTING
         printf("   Yacc: insert argument \"%s\"\n", $1->c_str());
       #endif
       Command::_currentSimpleCommand->insertArgument( $1 );
     else
-		  expandWildCardsIfNecessary($1);
+		  expandWildCardsIfNecessary((char *)$1->c_str());
   }
   ;
 

@@ -1138,7 +1138,7 @@ yyreduce:
   case 17: /* argument: WORD  */
 #line 102 "shell.y"
        {
-    if(strcmp(Command::_currentSimpleCommand->_arguments[0], "echo") == 0 && strchr((yyvsp[0].cpp_string), '?'))
+    if (strcmp(Command::_currentSimpleCommand->_arguments[0]->c_str(), "echo") == 0 && strchr((yyvsp[0].cpp_string), '?'))
       #ifdef PRINTING
         printf("   Yacc: insert argument \"%s\"\n", (yyvsp[0].cpp_string)->c_str());
       #endif
