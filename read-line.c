@@ -43,7 +43,7 @@ void read_line_print_usage()
 }
 
 
-vvoid refresh_display(int pos, int len) {
+void refresh_display(int pos, int len) {
   int i;
   char ch;
   
