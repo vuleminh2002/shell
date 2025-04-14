@@ -85,6 +85,9 @@ char * read_line() {
 
   line_length = 0;
   cursor_position = 0;
+  //clear buffer
+  memset(line_buffer, 0, MAX_BUFFER_LINE);
+
   // Read one line until enter is typed
   while (1) {
 
