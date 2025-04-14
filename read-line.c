@@ -11,7 +11,7 @@
 #include <unistd.h>
 
 #define MAX_BUFFER_LINE 2048
-
+#define MAX_HISTORY 100
 extern void tty_raw_mode(void);
 
 // Buffer where line is stored
