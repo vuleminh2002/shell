@@ -43,37 +43,24 @@ void read_line_print_usage()
 }
 
 
-void refreshLine() {
-  // Move cursor all the way back to the start
-  // by sending backspaces = cursor_position times
+vvoid refresh_display(int pos, int len) {
   int i;
-  for (i = 0; i < cursor_position; i++) {
-    char ch = 8; // ASCII backspace
-    write(1, &ch, 1);
+  char ch;
+  
+  // Save the current cursor position
+  write(1, "\033[s", 3);
+  
+  // Write the portion of the buffer from cursor to end
+  if (pos < len) {
+    write(1, &line_buffer[pos], len - pos);
   }
   
-  // Now overwrite the entire line with spaces
-  for (i = 0; i < line_length; i++) {
-    char ch = ' ';
-    write(1, &ch, 1);
-  }
-
-  // Move back again
-  for (i = 0; i < line_length; i++) {
-    char ch = 8;
-    write(1, &ch, 1);
-  }
-
-  // Print the updated buffer
-  write(1, line_buffer, line_length);
-
-  // Finally, move the cursor from end to the current position
-  int dist = line_length - cursor_position;
-  while (dist > 0) {
-    char ch = 8;
-    write(1, &ch, 1);
-    dist--;
-  }
+  // Write a space at the end (to erase any potential leftover character)
+  ch = ' ';
+  write(1, &ch, 1);
+  
+  // Restore cursor position
+  write(1, "\033[u", 3);
 }
 /* 
  * Input a line with some basic editing.
@@ -96,17 +83,37 @@ char * read_line() {
     read(0, &ch, 1);
 
     if (ch>=32) {
-      // It is a printable character. 
-
-      // Do echo
-      write(1,&ch,1);
-
+      // It is a printable character.
+      
       // If max number of character reached return.
-      if (line_length==MAX_BUFFER_LINE-2) break; 
-
-      // add char to buffer.
-      line_buffer[line_length]=ch;
-      line_length++;
+      if (line_length == MAX_BUFFER_LINE-2) continue;
+      
+      // If cursor is at the end of line, just add char
+      if (cursor_position == line_length) {
+        // Do echo
+        write(1, &ch, 1);
+        
+        // Add char to buffer
+        line_buffer[cursor_position] = ch;
+        cursor_position++;
+        line_length++;
+      } 
+      else {
+        // Inserting in the middle of the line
+        // First, make space by shifting characters
+        memmove(&line_buffer[cursor_position + 1], 
+                &line_buffer[cursor_position], 
+                line_length - cursor_position);
+        
+        // Insert the character
+        line_buffer[cursor_position] = ch;
+        cursor_position++;
+        line_length++;
+        
+        // Reprint the line from current position
+        write(1, &ch, 1); // Print the character just inserted
+        refresh_display(cursor_position, line_length);
+      }
     }
     else if (ch==10) {
       // <Enter> was typed. Return line
