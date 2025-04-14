@@ -35,7 +35,13 @@
 //#define yylex yylex
 #include <cstdio>
 #include "shell.hh"
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <dirent.h>
+#include <regex.h>
+#include <assert.h>
+#include "command.hh"
 void yyerror(const char * s);
 int yylex();
 static int cmpfunc(const void *a, const void *b);

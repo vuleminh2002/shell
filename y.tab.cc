@@ -133,9 +133,11 @@ typedef enum yysymbol_kind_t yysymbol_kind_t;
 
 void yyerror(const char * s);
 int yylex();
+static int cmpfunc(const void *a, const void *b);
+void expandWildCardsIfNecessary(char *arg);
+void expandWildCards(char *prefix, char *suffix);
 
-
-#line 139 "y.tab.cc"
+#line 141 "y.tab.cc"
 
 
 #ifdef short
@@ -518,9 +520,9 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    47,    47,    51,    52,    55,    59,    65,    66,    70,
-      71,    75,    83,    84,    85,    89,    90,    94,   103,   122,
-     125,   132,   146,   159,   171,   183,   190
+       0,    49,    49,    53,    54,    57,    61,    67,    68,    72,
+      73,    77,    85,    86,    87,    91,    92,    96,   108,   127,
+     130,   137,   151,   164,   176,   188,   195
 };
 #endif
 
@@ -1102,44 +1104,47 @@ yyreduce:
   switch (yyn)
     {
   case 6: /* simple_command: pipline iomodifier_opt_list background NEWLINE  */
-#line 59 "shell.y"
+#line 61 "shell.y"
                                                  {
     #ifdef PRINTING
       printf("   Yacc: Execute command\n");
     #endif
     Shell::_currentCommand.execute();
   }
-#line 1113 "y.tab.cc"
+#line 1115 "y.tab.cc"
     break;
 
   case 8: /* simple_command: error NEWLINE  */
-#line 66 "shell.y"
+#line 68 "shell.y"
                   { yyerrok; }
-#line 1119 "y.tab.cc"
+#line 1121 "y.tab.cc"
     break;
 
   case 11: /* command_and_args: command_word argument_list  */
-#line 75 "shell.y"
+#line 77 "shell.y"
                              {
     Shell::_currentCommand.
     insertSimpleCommand( Command::_currentSimpleCommand );
   }
-#line 1128 "y.tab.cc"
+#line 1130 "y.tab.cc"
     break;
 
   case 17: /* argument: WORD  */
-#line 94 "shell.y"
+#line 96 "shell.y"
        {
-    #ifdef PRINTING
-      printf("   Yacc: insert argument \"%s\"\n", (yyvsp[0].cpp_string)->c_str());
-    #endif
-    Command::_currentSimpleCommand->insertArgument( (yyvsp[0].cpp_string) );\
+    if(strcmp(Command::_currentSimpleCommand->_arguments[0], "echo") == 0 && strchr((yyvsp[0].cpp_string), '?'))
+      #ifdef PRINTING
+        printf("   Yacc: insert argument \"%s\"\n", (yyvsp[0].cpp_string)->c_str());
+      #endif
+      Command::_currentSimpleCommand->insertArgument( (yyvsp[0].cpp_string) );
+    else
+		  expandWildCardsIfNecessary((yyvsp[0].cpp_string));
   }
-#line 1139 "y.tab.cc"
+#line 1144 "y.tab.cc"
     break;
 
   case 18: /* command_word: WORD  */
-#line 103 "shell.y"
+#line 108 "shell.y"
        {
   //2.3: Exit
 	if ( *(yyvsp[0].cpp_string) == "exit") {
@@ -1154,27 +1159,27 @@ yyreduce:
     Command::_currentSimpleCommand = new SimpleCommand();
     Command::_currentSimpleCommand->insertArgument( (yyvsp[0].cpp_string) );
   }
-#line 1158 "y.tab.cc"
+#line 1163 "y.tab.cc"
     break;
 
   case 19: /* background: %empty  */
-#line 122 "shell.y"
+#line 127 "shell.y"
             {
       Shell::_currentCommand._background = false;
     }
-#line 1166 "y.tab.cc"
+#line 1171 "y.tab.cc"
     break;
 
   case 20: /* background: AMPERSAND  */
-#line 125 "shell.y"
+#line 130 "shell.y"
               {
       Shell::_currentCommand._background = true;
     }
-#line 1174 "y.tab.cc"
+#line 1179 "y.tab.cc"
     break;
 
   case 21: /* iomodifier_opt: GREAT WORD  */
-#line 132 "shell.y"
+#line 137 "shell.y"
              {
     if (Shell::_currentCommand._outFile != NULL ){
       
@@ -1187,11 +1192,11 @@ yyreduce:
     #endif
       Shell::_currentCommand._outFile = (yyvsp[0].cpp_string);
     }
-#line 1191 "y.tab.cc"
+#line 1196 "y.tab.cc"
     break;
 
   case 22: /* iomodifier_opt: GREATGREATAMP WORD  */
-#line 146 "shell.y"
+#line 151 "shell.y"
                      {
       if (Shell::_currentCommand._outFile != NULL ){
 		    printf("Ambiguous output redirect.\n");
@@ -1204,11 +1209,11 @@ yyreduce:
       Shell::_currentCommand._errFile = (yyvsp[0].cpp_string);
       Shell::_currentCommand._append = true;
     }
-#line 1208 "y.tab.cc"
+#line 1213 "y.tab.cc"
     break;
 
   case 23: /* iomodifier_opt: GREATGREAT WORD  */
-#line 159 "shell.y"
+#line 164 "shell.y"
                   {
       if (Shell::_currentCommand._outFile != NULL ){
 		    printf("Ambiguous output redirect.\n");
@@ -1220,11 +1225,11 @@ yyreduce:
       Shell::_currentCommand._outFile = (yyvsp[0].cpp_string);
       Shell::_currentCommand._append = true;
     }
-#line 1224 "y.tab.cc"
+#line 1229 "y.tab.cc"
     break;
 
   case 24: /* iomodifier_opt: GREATAMP WORD  */
-#line 171 "shell.y"
+#line 176 "shell.y"
                 {
       if (Shell::_currentCommand._outFile != NULL ){
 		    printf("Ambiguous output redirect.\n");
@@ -1236,22 +1241,22 @@ yyreduce:
       Shell::_currentCommand._outFile = (yyvsp[0].cpp_string);
       Shell::_currentCommand._errFile = (yyvsp[0].cpp_string); 
   }
-#line 1240 "y.tab.cc"
+#line 1245 "y.tab.cc"
     break;
 
   case 25: /* iomodifier_opt: GREAT2 WORD  */
-#line 183 "shell.y"
+#line 188 "shell.y"
               {
     #ifdef PRINTING
       printf("   Yacc: insert stderr redirection \"%s\"\n", (yyvsp[0].cpp_string)->c_str());
     #endif
       Shell::_currentCommand._errFile = (yyvsp[0].cpp_string);
     }
-#line 1251 "y.tab.cc"
+#line 1256 "y.tab.cc"
     break;
 
   case 26: /* iomodifier_opt: LESS WORD  */
-#line 190 "shell.y"
+#line 195 "shell.y"
             {
       if (Shell::_currentCommand._inFile != NULL ){
 		    printf("Ambiguous output redirect.\n");
@@ -1262,11 +1267,11 @@ yyreduce:
     #endif
       Shell::_currentCommand._inFile = (yyvsp[0].cpp_string);
     }
-#line 1266 "y.tab.cc"
+#line 1271 "y.tab.cc"
     break;
 
 
-#line 1270 "y.tab.cc"
+#line 1275 "y.tab.cc"
 
       default: break;
     }
@@ -1459,7 +1464,124 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 203 "shell.y"
+#line 208 "shell.y"
+
+
+// Global or static variables for Part 1
+int maxEntries = 20;
+int nEntries = 0;
+char **entries = NULL;
+
+// A helper compare function for qsort (or you can use C++ std::sort)
+static int cmpfunc(const void *a, const void *b) {
+    char *s1 = *(char**)a;
+    char *s2 = *(char**)b;
+    return strcmp(s1, s2);
+}
+
+// Convert wildcard pattern to a posix regex (e.g. '*.c' -> '^.*\.c$')
+static char *wildcardToRegex(const char *arg) {
+    // Enough space: each char might become 2+ chars in worst case
+    char *reg = (char*)malloc(2*strlen(arg) + 10);
+    char *r = reg;
+    const char *a = arg;
+
+    *r = '^'; r++;  // start anchor
+    while (*a) {
+        if (*a == '*') {
+            *r = '.'; r++;
+            *r = '*'; r++;
+        } else if (*a == '?') {
+            *r = '.'; r++;
+        } else if (*a == '.') {
+            *r = '\\'; r++;
+            *r = '.'; r++;
+        } else {
+            *r = *a; r++;
+        }
+        a++;
+    }
+    *r = '$'; r++;
+    *r = 0;   // null terminate
+    return reg;
+}
+
+// The actual expansion function. For Part 1, we ignore 'prefix' (if any)
+void expandWildCards(char *prefix, char *suffix)
+{
+    // 1) Convert 'suffix' to a regex
+    char *regstr = wildcardToRegex(suffix);
+
+    // Compile
+    regex_t re;
+    int ret = regcomp(&re, regstr, REG_EXTENDED | REG_NOSUB);
+    free(regstr);
+    if (ret != 0) {
+        // If compile fails, fallback
+        return; 
+    }
+
+    // 2) Open current directory
+    DIR *dir = opendir(".");
+    if (!dir) {
+        perror("opendir");
+        regfree(&re);
+        return;
+    }
+
+    // 3) readdir + regexec
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != NULL) {
+        // skip "." and ".." if you want
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+            continue;
+        }
+
+        if (regexec(&re, entry->d_name, 0, NULL, 0) == 0) {
+            // match
+            // store into 'entries' array
+            if (nEntries == maxEntries) {
+                maxEntries *= 2;
+                entries = (char**)realloc(entries, maxEntries * sizeof(char*));
+                assert(entries);
+            }
+            entries[nEntries] = strdup(entry->d_name); 
+            nEntries++;
+        }
+    }
+    closedir(dir);
+    regfree(&re);
+}
+
+// The user-facing function
+void expandWildCardsIfNecessary(char *arg) {
+    // Initialize / reset global array 
+    maxEntries = 20;
+    nEntries = 0;
+    entries = (char**)malloc(maxEntries * sizeof(char*));
+
+    if (strchr(arg, '*') || strchr(arg, '?')) {
+        // Has wildcard => expand
+        expandWildCards(NULL, arg);
+
+        if (nEntries == 0) {
+            // No matches => fallback to literal
+            Command::_currentSimpleCommand->insertArgument(strdup(arg));
+        } else {
+            // sort
+            qsort(entries, nEntries, sizeof(char*), cmpfunc);
+
+            // insert each
+            for (int i = 0; i < nEntries; i++) {
+                Command::_currentSimpleCommand->insertArgument(entries[i]);
+            }
+        }
+        free(entries);
+    } else {
+        // no wildcard => just insert directly
+        Command::_currentSimpleCommand->insertArgument(strdup(arg));
+    }
+}
 
 
 void
