@@ -44,6 +44,7 @@ void add_to_history(const char* line) {
       history_length++;
   }
 }
+  
 
 
   // Function to clear the current line and display a history entry
