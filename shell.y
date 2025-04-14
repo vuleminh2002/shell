@@ -312,20 +312,21 @@ void expandWildCardsIfNecessary(char *arg) {
 
         if (nEntries == 0) {
             // No matches => fallback to literal
-            Command::_currentSimpleCommand->insertArgument(strdup(arg));
+            Command::_currentSimpleCommand->insertArgument(new std::string(arg));
         } else {
             // sort
             qsort(entries, nEntries, sizeof(char*), cmpfunc);
 
             // insert each
             for (int i = 0; i < nEntries; i++) {
-                Command::_currentSimpleCommand->insertArgument(entries[i]);
+                Command::_currentSimpleCommand->insertArgument(new std::string(entries[i]));
+                free(entries[i]); // if strdup was used earlier
             }
         }
         free(entries);
     } else {
         // no wildcard => just insert directly
-        Command::_currentSimpleCommand->insertArgument(strdup(arg));
+        Command::_currentSimpleCommand->insertArgument(new std::string(arg));
     }
 }
 

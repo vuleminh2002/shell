@@ -1138,13 +1138,13 @@ yyreduce:
   case 17: /* argument: WORD  */
 #line 102 "shell.y"
        {
-    if (strcmp(Command::_currentSimpleCommand->_arguments[0]->c_str(), "echo") == 0 && strchr((yyvsp[0].cpp_string), '?'))
+    if (strcmp(Command::_currentSimpleCommand->_arguments[0]->c_str(), "echo") == 0 && strchr((char *)(yyvsp[0].cpp_string)->c_str(), '?'))
       #ifdef PRINTING
         printf("   Yacc: insert argument \"%s\"\n", (yyvsp[0].cpp_string)->c_str());
       #endif
       Command::_currentSimpleCommand->insertArgument( (yyvsp[0].cpp_string) );
     else
-		  expandWildCardsIfNecessary((yyvsp[0].cpp_string));
+		  expandWildCardsIfNecessary((char *)(yyvsp[0].cpp_string)->c_str());
   }
 #line 1150 "y.tab.cc"
     break;
