@@ -131,21 +131,22 @@ char * read_line() {
     }
     else if (ch == 8) {
       // <backspace> was typed. Remove previous character read.
-
-      // Go back one character
-      ch = 8;
-      write(1,&ch,1);
-
-      // Write a space to erase the last character read
-      ch = ' ';
-      write(1,&ch,1);
-
-      // Go back one character
-      ch = 8;
-      write(1,&ch,1);
-
-      // Remove one character from buffer
-      line_length--;
+      if (cursor_position > 0) {
+        // Move content after cursor one position left
+        memmove(&line_buffer[cursor_position - 1], 
+                &line_buffer[cursor_position], 
+                line_length - cursor_position);
+        
+        cursor_position--;
+        line_length--;
+        
+        // Move cursor back
+        ch = 8;
+        write(1, &ch, 1);
+        
+        // Reprint the line from current position
+        refresh_display(cursor_position, line_length);
+      }
     }
     else if (ch==27) {
       // Escape sequence. Read two chars more
