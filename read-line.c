@@ -119,16 +119,20 @@ char * read_line() {
         // Move cursor left
         if (cursor_position > 0) {
           cursor_position--;
-          write(1, "\b", 1);  // Move cursor back visually
+          // Move left
+          write(1, "\033[D", 3);
       }
     }
     // Right arrow: ESC [ C => 27, 91, 67
     else if (ch1 == 91 && ch2 == 67) {
-        // Move cursor right
-        if (cursor_position < line_length) {
-          write(1, &line_buffer[cursor_position], 1); // Show the character to the right
-          cursor_position++;
-      }      
+      if (cursor_position < line_length) {
+        cursor_position++;
+        // Either: 
+        // 1) visually move cursor with an ANSI code
+        write(1, "\033[C", 3);
+        // 2) Or do full re-draw:
+        // refreshLine();
+    }
     }
       if (ch1==91 && ch2==65) {
 	// Up arrow. Print next line in history.
