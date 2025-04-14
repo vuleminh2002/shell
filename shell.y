@@ -278,10 +278,7 @@ void expandWildCards(char *prefix, char *suffix)
     // 3) readdir + regexec
     struct dirent *entry;
     while ((entry = readdir(dir)) != NULL) {
-        // skip "." and ".." if you want
-        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
-            continue;
-        }
+      
         if (entry->d_name[0] == '.' && suffix[0] != '.') {
         continue;
     }

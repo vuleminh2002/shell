@@ -1542,6 +1542,9 @@ void expandWildCards(char *prefix, char *suffix)
         if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
             continue;
         }
+        if (entry->d_name[0] == '.' && suffix[0] != '.') {
+        continue;
+    }
 
         if (regexec(&re, entry->d_name, 0, NULL, 0) == 0) {
             // match
