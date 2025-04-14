@@ -120,7 +120,7 @@ char * read_line() {
         if (cursor_position > 0) {
             cursor_position--;
             // Move physically left one char
-            char back = 8; 
+            char back = 1; 
             write(1, &back, 1);
         }
     }
