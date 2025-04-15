@@ -11,49 +11,157 @@
  #include <unistd.h>
  
  #define MAX_BUFFER_LINE 2048
+ 
+ // --- NEW HISTORY DEFINES/VARIABLES ---
  #define HISTORY_SIZE 16
+ 
+ // The ring buffer for storing up to HISTORY_SIZE commands
+ char *history[HISTORY_SIZE];
+ // `history_index` is where the *next* new command will be stored
+ int history_index = 0;
+ // `history_index_rev` is used when navigating up/down
+ int history_index_rev = 0;
+ // If we've already filled all HISTORY_SIZE slots at least once
+ int history_full = 0;
+ // For convenience, keep a variable with the ring size
+ int history_length = HISTORY_SIZE;
+ 
+ // --- FROM YOUR ORIGINAL CODE ---
  
  extern void tty_raw_mode(void);
  
- // Buffer where line is stored
+ // Buffer where the current line is stored
  int line_length;
  char line_buffer[MAX_BUFFER_LINE];
- char right_side_buffer[MAX_BUFFER_LINE];
- int right_side_length;
+ int cursor_position; 
  
- // Simple history array
- // This history does not change. 
- // Yours have to be updated.
- int history_index = 0;
- int history_index_rev;
- int history_full = 0;
- char * history[HISTORY_SIZE];
- /*char * history [] = {
-   "ls -al | grep x", 
-   "ps -e",
-   "cat read-line-example.c",
-   "vi hello.c",
-   "make",
-   "ls -al | grep xxx | grep yyy"
- };*/
- int history_length = HISTORY_SIZE;
+ // Forward declarations
+ void read_line_print_usage();
+ void refresh_display(int pos, int len);
  
+ // Print usage message (unchanged)
  void read_line_print_usage()
  {
    char * usage = "\n"
-     " ctr-a        Move to the beiginning of line\n"
-     " ctr-e        Move to the beiginning of line\n"
-     " ctr-h        Removes the character at the position before the cursor.\n"
-     " ctr-h        Removes the character at the cursor\n"
      " ctrl-?       Print usage\n"
      " Backspace    Deletes last character\n"
-     " up arrow     See last command in the history\n";
+     " up arrow     See last command in the history\n"
+     " down arrow   See next command in the history\n"
+     " ctrl-A       Move cursor to beginning of line\n"
+     " ctrl-E       Move cursor to end of line\n";
  
    write(1, usage, strlen(usage));
  }
  
+ // A helper to refresh line display after insertions/deletions in the middle
+ void refresh_display(int pos, int len) {
+   // Save the current cursor position
+   write(1, "\033[s", 3);
+ 
+   // Write the portion of the buffer from cursor to end
+   if (pos < len) {
+     write(1, &line_buffer[pos], len - pos);
+   }
+   // Write a space at the end (to erase any leftover character)
+   char ch = ' ';
+   write(1, &ch, 1);
+ 
+   // Restore cursor position
+   write(1, "\033[u", 3);
+ }
+ 
+ /*
+  * A helper to clear the entire current line from the screen:
+  *   - Move cursor all the way left,
+  *   - Overwrite with spaces,
+  *   - Move cursor back again.
+  */
+ static void clear_current_line_on_screen(int length)
+ {
+   char ch;
+   // Move cursor to beginning (carriage return)
+   ch = 13; 
+   write(1, &ch, 1);
+   // Print spaces to cover the old line
+   for (int i = 0; i < length; i++) {
+     ch = ' ';
+     write(1, &ch, 1);
+   }
+   // Move to beginning again
+   ch = 13; 
+   write(1, &ch, 1);
+ }
+ 
+ /*
+  * Store the current line_buffer into history (if non-empty).
+  * This matches the ring-buffer approach in your snippet.
+  */
+ static void store_line_in_history()
+ {
+   if (line_length == 0) {
+     return; // don't store empty commands
+   }
+ 
+   // If we haven't allocated a slot for this ring position yet, do so
+   if (history[history_index] == NULL) {
+     history[history_index] = (char *)malloc(MAX_BUFFER_LINE);
+   }
+ 
+   // Copy the new command into history
+   strcpy(history[history_index], line_buffer);
+ 
+   // Update the "reverse index" to point here
+   history_index_rev = history_index;
+ 
+   // Advance history_index (the next new command will go there)
+   history_index++;
+   if (history_index >= history_length) {
+     history_index = 0;
+     history_full = 1; 
+   }
+ }
+ 
+ /*
+  * Handle the up/down arrow logic, similar to the snippet:
+  *   - Erase the current line from the screen
+  *   - Copy the history entry at history_index_rev
+  *   - Then compute a new history_index_rev in a circular manner
+  *
+  *   `direction` is -1 for UP, +1 for DOWN.
+  */
+ static void handle_history_navigation(int direction)
+ {
+   // If no commands stored yet, do nothing
+   int stored_count = history_full ? history_length : history_index;
+   if (stored_count == 0) {
+     return;
+   }
+ 
+   // Clear old line from screen
+   clear_current_line_on_screen(line_length);
+ 
+   // Copy the command from history
+   strcpy(line_buffer, history[history_index_rev]);
+   line_length = strlen(line_buffer);
+   cursor_position = line_length;
+ 
+   // Echo it to the screen
+   write(1, line_buffer, line_length);
+ 
+   // Move history_index_rev (the line we will show next time)
+   // in a circular manner
+   int tmp = stored_count; // # commands actually in the ring
+   // Because we just used the current history_index_rev, 
+   // next time we want to move by `direction`
+   history_index_rev = (history_index_rev + direction) % tmp;
+   // If negative, wrap around
+   if (history_index_rev < 0) {
+     history_index_rev = tmp - 1;
+   }
+ }
+ 
  /* 
-  * Input a line with some basic editing.
+  * Read a line with some basic editing.
   */
  char * read_line() {
  
@@ -61,7 +169,9 @@
    tty_raw_mode();
  
    line_length = 0;
-   right_side_length = 0;
+   cursor_position = 0;
+ 
+   memset(line_buffer, 0, MAX_BUFFER_LINE);
  
    // Read one line until enter is typed
    while (1) {
@@ -70,212 +180,171 @@
      char ch;
      read(0, &ch, 1);
  
-     if (ch>=32 && ch != 127) {
-       // It is a printable character. 
- 
-       // Do echo
-       write(1,&ch,1);
- 
-       // If max number of character reached return.
-       if (line_length==MAX_BUFFER_LINE-2) break; 
-     
-       // add char to buffer.
-       line_buffer[line_length]=ch;
-       line_length++;
- 
-       // Check right_side_buffer
-       if (right_side_length) {
-         for (int i=right_side_length-1; i>=0; i--) {
-           char c = right_side_buffer[i];
-           write(1,&c,1);
-         }
+     // ----------------------------
+     // Printable character
+     // ----------------------------
+     if (ch >= 32 && ch != 127) {
+       // If max number of characters reached, ignore
+       if (line_length == MAX_BUFFER_LINE-2) {
+         continue;
        }
-       for (int i=0; i<right_side_length; i++) {
-         char c = 8;
-         write(1,&c,1);
-       }
-     }
-     else if (ch==10) {
-       // <Enter> was typed. Return line
-       if (right_side_length) {
-         for (int i=right_side_length-1; i>=0; i--) {
-           char c = right_side_buffer[i];
- 
-           line_buffer[line_length]=c;
-           line_length++;
-         }
-       }
- 
-       if (line_length != 0) {
-         if (history[history_index]==NULL) 
-           history[history_index] = (char *)malloc(MAX_BUFFER_LINE);
-   
-         strcpy(history[history_index], line_buffer);
-         history_index_rev = history_index;
-         history_index++;
-         if (history_index>=history_length) {
-           history_index = 0;
-           history_full = 1;
-         }
-       }
- 
-       right_side_length=0;
-       // Print newline
-       write(1,&ch,1);
- 
-       break;
-     }
-     else if (ch == 31) {
-       // ctrl-?
-       read_line_print_usage();
-       line_buffer[0]=0;
-       break;
-     }
-     else if (ch == 1) {
-       // ctrl-A was typed. The cursor moves to the beginning of the line
-       int tmp = line_length;
-       for (int i=0; i<tmp; i++) {
-         char c = 8;
-         write(1,&c,1);
-         right_side_buffer[right_side_length] = line_buffer[line_length-1];
-         right_side_length++;
-         line_length--;
-       }
-     }
-     else if (ch == 5) {
-       // ctrl-E was typed. The cursor moves to the end of the line
-       for (int i=right_side_length-1; i>=0; i--) {
-         write(1,"\033[1C",5);
-         line_buffer[line_length]=right_side_buffer[right_side_length-1];
-         right_side_length--;
-         line_length++;
-       }
-     }
-     else if (ch == 4) {
-       // ctrl-D was typed
- 
-       // Go back one character
-       if (line_length == 0) continue;
- 
-       for(int i=right_side_length-2; i>=0; i--) {
-         char c = right_side_buffer[i];
-         write(1,&c,1);
-       }
-       // Write a space to erase the last character read
-       ch = ' ';
-       write(1,&ch,1);
- 
-       // Go back one character
-       for (int i=0; i<right_side_length; i++) {
-         char c = 8;
-         write(1,&c,1);
-       }
- 
-       // Remove one character from buffer
-       right_side_length--;
-     }
-     else if (ch == 8 || ch == 127) {
-       // <backspace> was typed. Remove previous character read.
- 
-       // Removes the character at the cursor
-       if (line_length == 0) continue;
- 
-       ch = 8;
-       write(1,&ch,1);
- 
-       for(int i=right_side_length-1; i>=0; i--) {
-         char c = right_side_buffer[i];
-         write(1,&c,1);
-       }
-       // Write a space to erase the last character read
-       ch = ' ';
-       write(1,&ch,1);
        
-       // Go back one character
-       for (int i=0; i<right_side_length+1; i++) {
-         char c = 8;
-         write(1,&c,1);
-       }
+       // If cursor is at the end of line, just append
+       if (cursor_position == line_length) {
+         // Echo the character
+         write(1, &ch, 1);
  
-       // Remove one character from buffer
-       line_length--;
+         // Add char to buffer
+         line_buffer[cursor_position] = ch;
+         cursor_position++;
+         line_length++;
+       } 
+       else {
+         // Inserting in the middle
+         // Shift existing text to the right
+         memmove(&line_buffer[cursor_position + 1], 
+                 &line_buffer[cursor_position], 
+                 line_length - cursor_position);
+         // Insert the new character
+         line_buffer[cursor_position] = ch;
+         cursor_position++;
+         line_length++;
+ 
+         // Echo the new character
+         write(1, &ch, 1);
+ 
+         // Refresh what's after the cursor
+         refresh_display(cursor_position, line_length);
+       }
      }
-     else if (ch==27) {
-       // Escape sequence. Read two chars more
-       //
-       // HINT: Use the program "keyboard-example" to
-       // see the ascii code for the different chars typed.
-       //
-       char ch1; 
-       char ch2;
+     // ----------------------------
+     // Enter key
+     // ----------------------------
+     else if (ch == 10) {
+       // Print newline
+       write(1, &ch, 1);
+ 
+       // Store this command in history (if non-empty)
+       line_buffer[line_length] = '\0';
+       store_line_in_history();
+ 
+       // Add the newline + null so the caller sees it
+       line_buffer[line_length] = 10;
+       line_length++;
+       line_buffer[line_length] = 0;
+ 
+       break;
+     }
+     // ----------------------------
+     // ctrl-? (ASCII 31)
+     // ----------------------------
+     else if (ch == 31) {
+       // Print usage
+       read_line_print_usage();
+       // Clear line buffer
+       line_length = 0;
+       cursor_position = 0;
+       line_buffer[0] = '\0';
+       break;
+     }
+     // ----------------------------
+     // Backspace or DEL
+     // ----------------------------
+     else if (ch == 8 || ch == 127) {
+       if (cursor_position > 0) {
+         // Shift text left by one
+         memmove(&line_buffer[cursor_position - 1],
+                 &line_buffer[cursor_position],
+                 line_length - cursor_position);
+         cursor_position--;
+         line_length--;
+         
+         // Move cursor back on screen
+         char bs = 8;
+         write(1, &bs, 1);
+ 
+         // Refresh the rest
+         refresh_display(cursor_position, line_length);
+       }
+     }
+     // ----------------------------
+     // ctrl-D (Forward Delete)
+     // ----------------------------
+     else if (ch == 4) {
+       if (cursor_position < line_length) {
+         // Shift everything left from cursor
+         memmove(&line_buffer[cursor_position],
+                 &line_buffer[cursor_position + 1],
+                 line_length - cursor_position - 1);
+         line_length--;
+         // Refresh what's after the cursor
+         refresh_display(cursor_position, line_length);
+       }
+     }
+     // ----------------------------
+     // ctrl-A (Home)
+     // ----------------------------
+     else if (ch == 1) {
+       // Move cursor all the way to the left
+       while (cursor_position > 0) {
+         char bs = 8;
+         write(1, &bs, 1);
+         cursor_position--;
+       }
+     }
+     // ----------------------------
+     // ctrl-E (End)
+     // ----------------------------
+     else if (ch == 5) {
+       // Move cursor to end of line
+       while (cursor_position < line_length) {
+         char forward_char = line_buffer[cursor_position];
+         write(1, &forward_char, 1);
+         cursor_position++;
+       }
+     }
+     // ----------------------------
+     // Escape sequence for arrows
+     // ----------------------------
+     else if (ch == 27) {
+       // Read the next two chars
+       char ch1, ch2;
        read(0, &ch1, 1);
        read(0, &ch2, 1);
-       if (ch1==91 && (ch2==65 || ch2==66)) {
-         // Up arrow. Print next line in history.
-        
-         // Erase old line
-         // Print backspaces
-         int i = 0;
-         for (i =0; i < line_length; i++) {
-           ch = 8;
-           write(1,&ch,1);
-         }
-        
-         // Print spaces on top
-         for (i =0; i < line_length+right_side_length; i++) {
-           ch = ' ';
-           write(1,&ch,1);
-         }
-        
-         // Print backspaces
-         for (i =0; i < line_length+right_side_length; i++) {
-           ch = 8;
-           write(1,&ch,1);
-         }	
-         right_side_length = 0;
-         // Copy line from history
-         strcpy(line_buffer, history[history_index_rev]);
-         line_length = strlen(line_buffer);
-         int tmp = history_full?history_length:history_index;
-         int up_down = ch2 == 65? -1 : 1;
-         history_index_rev=(history_index_rev+up_down)%tmp;
-         if (history_index_rev == -1) history_index_rev = tmp-1;
-        
-         // echo line
-         write(1, line_buffer, line_length);
-       } 
-       else if (ch1==91 && ch2==68) {
-         // Left arrow. 
  
-         // Move the cursor to the left
-         if (line_length == 0) continue;
-         ch = 8;
-         write(1,&ch,1);
-         // Allow insertion 
-         right_side_buffer[right_side_length] = line_buffer[line_length-1];
-         right_side_length++;
-         line_length--;
+       // Left arrow: ESC [ D
+       if (ch1 == 91 && ch2 == 68) {
+         if (cursor_position > 0) {
+           // Move cursor left
+           char bs = 8;
+           write(1, &bs, 1);
+           cursor_position--;
+         }
        }
-       else if (ch1==91 && ch2==67) {
-         // right arrow. 
- 
-         // Move the cursor to the arrow
-         if (right_side_length == 0) continue;
-         write(1,"\033[1C",5);
-         // Allow insertion 
-         line_buffer[line_length]=right_side_buffer[right_side_length-1];
-         line_length++;
-         right_side_length--;
+       // Right arrow: ESC [ C
+       else if (ch1 == 91 && ch2 == 67) {
+         if (cursor_position < line_length) {
+           // Move cursor right
+           char forward_char = line_buffer[cursor_position];
+           write(1, &forward_char, 1);
+           cursor_position++;
+         }
        }
-       
+       // Up arrow: ESC [ A
+       else if (ch1 == 91 && ch2 == 65) {
+         // direction = -1 (move to older command)
+         handle_history_navigation(-1);
+       }
+       // Down arrow: ESC [ B
+       else if (ch1 == 91 && ch2 == 66) {
+         // direction = +1 (move to newer command)
+         handle_history_navigation(+1);
+       }
+       // ignore other ESC sequences
      }
  
+     // Ignore any other control characters
    }
- 
-   // Add eol and null char at the end of string
-   line_buffer[line_length]=10;
-   line_length++;
-   line_buffer[line_length]=0;
  
    return line_buffer;
  }
