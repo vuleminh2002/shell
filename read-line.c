@@ -12,21 +12,14 @@
  
  #define MAX_BUFFER_LINE 2048
  
- // --- NEW HISTORY DEFINES/VARIABLES ---
  #define HISTORY_SIZE 16
  
- // The ring buffer for storing up to HISTORY_SIZE commands
  char *history[HISTORY_SIZE];
- // `history_index` is where the *next* new command will be stored
  int history_index = 0;
- // `history_index_rev` is used when navigating up/down
  int history_index_rev = 0;
- // If we've already filled all HISTORY_SIZE slots at least once
  int history_full = 0;
- // For convenience, keep a variable with the ring size
  int history_length = HISTORY_SIZE;
  
- // --- FROM YOUR ORIGINAL CODE ---
  
  extern void tty_raw_mode(void);
  
@@ -58,15 +51,12 @@
    // Save the current cursor position
    write(1, "\033[s", 3);
  
-   // Write the portion of the buffer from cursor to end
    if (pos < len) {
      write(1, &line_buffer[pos], len - pos);
    }
-   // Write a space at the end (to erase any leftover character)
    char ch = ' ';
    write(1, &ch, 1);
  
-   // Restore cursor position
    write(1, "\033[u", 3);
  }
  
@@ -120,15 +110,7 @@
      history_full = 1; 
    }
  }
- 
- /*
-  * Handle the up/down arrow logic, similar to the snippet:
-  *   - Erase the current line from the screen
-  *   - Copy the history entry at history_index_rev
-  *   - Then compute a new history_index_rev in a circular manner
-  *
-  *   `direction` is -1 for UP, +1 for DOWN.
-  */
+
  static void handle_history_navigation(int direction)
  {
    // If no commands stored yet, do nothing
@@ -148,11 +130,8 @@
    // Echo it to the screen
    write(1, line_buffer, line_length);
  
-   // Move history_index_rev (the line we will show next time)
-   // in a circular manner
    int tmp = stored_count; // # commands actually in the ring
-   // Because we just used the current history_index_rev, 
-   // next time we want to move by `direction`
+
    history_index_rev = (history_index_rev + direction) % tmp;
    // If negative, wrap around
    if (history_index_rev < 0) {
@@ -179,10 +158,7 @@
      // Read one character in raw mode.
      char ch;
      read(0, &ch, 1);
- 
-     // ----------------------------
-     // Printable character
-     // ----------------------------
+
      if (ch >= 32 && ch != 127) {
        // If max number of characters reached, ignore
        if (line_length == MAX_BUFFER_LINE-2) {
@@ -200,8 +176,7 @@
          line_length++;
        } 
        else {
-         // Inserting in the middle
-         // Shift existing text to the right
+
          memmove(&line_buffer[cursor_position + 1], 
                  &line_buffer[cursor_position], 
                  line_length - cursor_position);
@@ -217,9 +192,7 @@
          refresh_display(cursor_position, line_length);
        }
      }
-     // ----------------------------
-     // Enter key
-     // ----------------------------
+
      else if (ch == 10) {
        // Print newline
        write(1, &ch, 1);
@@ -235,9 +208,7 @@
  
        break;
      }
-     // ----------------------------
-     // ctrl-? (ASCII 31)
-     // ----------------------------
+
      else if (ch == 31) {
        // Print usage
        read_line_print_usage();
@@ -247,10 +218,8 @@
        line_buffer[0] = '\0';
        break;
      }
-     // ----------------------------
-     // Backspace or DEL
-     // ----------------------------
-     else if (ch == 8 || ch == 127) {
+      //ctrl h
+     else if (ch == 8 ) {
        if (cursor_position > 0) {
          // Shift text left by one
          memmove(&line_buffer[cursor_position - 1],
@@ -267,9 +236,7 @@
          refresh_display(cursor_position, line_length);
        }
      }
-     // ----------------------------
-     // ctrl-D (Forward Delete)
-     // ----------------------------
+     //ctrl d
      else if (ch == 4) {
        if (cursor_position < line_length) {
          // Shift everything left from cursor
@@ -281,9 +248,7 @@
          refresh_display(cursor_position, line_length);
        }
      }
-     // ----------------------------
-     // ctrl-A (Home)
-     // ----------------------------
+
      else if (ch == 1) {
        // Move cursor all the way to the left
        while (cursor_position > 0) {
@@ -292,9 +257,7 @@
          cursor_position--;
        }
      }
-     // ----------------------------
-     // ctrl-E (End)
-     // ----------------------------
+
      else if (ch == 5) {
        // Move cursor to end of line
        while (cursor_position < line_length) {
@@ -303,9 +266,7 @@
          cursor_position++;
        }
      }
-     // ----------------------------
-     // Escape sequence for arrows
-     // ----------------------------
+
      else if (ch == 27) {
        // Read the next two chars
        char ch1, ch2;
@@ -330,20 +291,19 @@
            cursor_position++;
          }
        }
-       // Up arrow: ESC [ A
+ 
        else if (ch1 == 91 && ch2 == 65) {
          // direction = -1 (move to older command)
          handle_history_navigation(-1);
        }
-       // Down arrow: ESC [ B
+       // Down arrow:
        else if (ch1 == 91 && ch2 == 66) {
          // direction = +1 (move to newer command)
          handle_history_navigation(+1);
        }
-       // ignore other ESC sequences
+    
      }
  
-     // Ignore any other control characters
    }
  
    return line_buffer;
