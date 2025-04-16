@@ -60,12 +60,7 @@
    write(1, "\033[u", 3);
  }
  
- /*
-  * A helper to clear the entire current line from the screen:
-  *   - Move cursor all the way left,
-  *   - Overwrite with spaces,
-  *   - Move cursor back again.
-  */
+ 
  static void clear_current_line_on_screen(int length)
  {
    char ch;

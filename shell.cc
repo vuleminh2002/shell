@@ -38,7 +38,7 @@ extern "C" void zombieHandler(int sig){
     // This ensures multiple expansions in one token are replaced.
     std::string result = input;
 
-    // Pattern A: ${var}
+    // ${var}
     std::regex curlyPattern("\\$\\{([^}]+)\\}");
 
     bool changed = true;
